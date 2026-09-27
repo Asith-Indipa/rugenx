@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+/.pnp
+.pnp.*
+
+# Next.js build output
+.next/
+out/
+
+# Production build
+build
+dist
+docs
+
+# Environment variables
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# OS generated files
+.DS_Store
+Thumbs.db
