@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import {
+  ArrowRight,
   ArrowUpRight,
   Box,
   ChevronLeft,
@@ -22,6 +23,7 @@ import {
   Wrench,
   X,
   Zap,
+  Handshake,
 } from 'lucide-react'
 
 const capabilities = [
@@ -103,7 +105,47 @@ const industries = [
   },
 ] as const
 
-const focusAreas = ['Automated processing systems', 'Drying & dehydration technologies', 'Grinding & powder processing', 'Waste plastic processing', 'Industrial monitoring', 'Custom machinery']
+const focusAreas = [
+  'Automated processing systems',
+  'Drying & dehydration technologies',
+  'Grinding & powder processing',
+  'Waste plastic processing',
+  'Industrial monitoring',
+  'Custom machinery',
+]
+
+const engagementModels = [
+  {
+    number: '01',
+    title: 'Project-Based Engineering',
+    description: 'Complete engineering solutions developed for specific technical requirements, milestones, and deliverable targets.',
+  },
+  {
+    number: '02',
+    title: 'Engineering Consultancy',
+    description: 'Specialist technical expertise and diagnostic reviews provided to solve difficult bottlenecks and support critical decisions.',
+  },
+  {
+    number: '03',
+    title: 'External R&D Partnership',
+    description: 'Long-term strategic collaboration where RUGENX functions seamlessly as your external multidisciplinary R&D wing.',
+  },
+  {
+    number: '04',
+    title: 'Product Development Partnership',
+    description: 'Collaborative development of new industrial hardware from early-stage conceptualization through to commercialization.',
+  },
+  {
+    number: '05',
+    title: 'Technology Integration',
+    description: 'Interfacing mechanical, electronic, IoT sensors, firmware, and PLC automation into cohesive, reliable industrial systems.',
+  },
+  {
+    number: '06',
+    title: 'Manufacturing & Implementation Support',
+    description: 'Hands-on engineering support across precision fabrication, vendor coordination, installation, and field commissioning.',
+  },
+] as const
 
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -142,24 +184,130 @@ export default function Page() {
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
           <a href="#top" className="flex items-center gap-3" aria-label="RUGENX home">
             <Image
-              src="/RugenX - Logo_BLACK.png"
-              alt="RUGENX Logo"
-              width={160}
-              height={84}
-              className="h-9 w-auto object-contain"
+              src="/rugenx-logo.png"
+              alt="RUGENX (PVT) LTD. ENGINEERED TO PERFORM"
+              width={180}
+              height={48}
+              className="h-10 w-auto object-contain"
               priority
             />
           </a>
-          <div className="hidden items-center gap-7 text-[11px] font-bold uppercase tracking-[0.14em] text-[#4B5563] lg:flex"><a href="#about" className="hover:text-[#D99A0F]">About</a><a href="#capabilities" className="hover:text-[#D99A0F]">Services</a><a href="#industries" className="hover:text-[#D99A0F]">Industries</a><a href="#work" className="hover:text-[#D99A0F]">How we work</a></div>
-          <a href="#contact" className="hidden border border-[#1F2937] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] transition-colors hover:border-[#D99A0F] hover:text-[#8C6109] sm:block">Start a project <ArrowUpRight className="ml-2 inline" size={14} /></a>
+          <div className="hidden items-center gap-8 text-[13px] font-medium text-[#4B5563] lg:flex">
+            <a href="#top" className="border-b-2 border-[#F8B526] pb-1 font-semibold text-[#1F2937]">Home</a>
+            <a href="#about" className="transition-colors hover:text-[#D99A0F]">About</a>
+            <a href="#capabilities" className="transition-colors hover:text-[#D99A0F]">Services</a>
+            <a href="#industries" className="transition-colors hover:text-[#D99A0F]">Projects</a>
+            <a href="#engagement" className="transition-colors hover:text-[#D99A0F]">R&amp;D</a>
+            <a href="#contact" className="transition-colors hover:text-[#D99A0F]">Contact</a>
+          </div>
+          <a
+            href="#contact"
+            className="hidden items-center gap-2 rounded-full bg-[#F8B526] px-6 py-2.5 text-xs font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow sm:inline-flex"
+          >
+            Get in Touch <ArrowRight size={14} />
+          </a>
           <button className="lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>{menuOpen ? <X /> : <Menu />}</button>
         </nav>
-        {menuOpen && <div className="border-t border-[#E5E7EB] bg-white px-6 py-5 lg:hidden"><div className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest"><a href="#about" onClick={() => setMenuOpen(false)}>About</a><a href="#capabilities" onClick={() => setMenuOpen(false)}>Services</a><a href="#industries" onClick={() => setMenuOpen(false)}>Industries</a><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a></div></div>}
+        {menuOpen && (
+          <div className="border-t border-[#E5E7EB] bg-white px-6 py-5 lg:hidden">
+            <div className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest">
+              <a href="#top" onClick={() => setMenuOpen(false)}>Home</a>
+              <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+              <a href="#capabilities" onClick={() => setMenuOpen(false)}>Services</a>
+              <a href="#industries" onClick={() => setMenuOpen(false)}>Projects</a>
+              <a href="#engagement" onClick={() => setMenuOpen(false)}>R&amp;D</a>
+              <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+            </div>
+          </div>
+        )}
       </header>
 
-      <section className="hero-grid relative border-b border-[#E5E7EB] bg-[#FFFFFF]">
-        <div className="absolute right-[-10%] top-20 h-[620px] w-[620px] rounded-full border border-[#FCD580]/70" aria-hidden="true" /><div className="absolute right-[9%] top-40 h-[360px] w-[360px] rounded-full border border-[#FCD580]/60" aria-hidden="true" />
-        <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-24 lg:px-10 lg:pb-28 lg:pt-32"><div className="max-w-5xl"><p className="eyebrow"><span className="mr-3 inline-block h-px w-9 bg-[#F8B526]" />Engineering consultancy · Sri Lanka</p><h1 className="mt-7 max-w-4xl text-[clamp(3.8rem,9vw,8.7rem)] font-semibold leading-[.86] tracking-[-.08em]">Engineered<br /><span className="text-[#F8B526]">to perform.</span></h1><p className="mt-10 max-w-2xl text-base leading-7 text-[#4B5563] md:text-lg">Engineering Consultancy | Product Development | R&D | Simulation | Automation | Industrial Solutions</p><div className="mt-9 flex flex-wrap gap-4"><a href="#contact" className="inline-flex items-center gap-3 bg-[#F8B526] px-5 py-3.5 text-sm font-bold transition-colors hover:bg-[#D99A0F]">Get in touch <ArrowUpRight size={18} /></a><a href="#capabilities" className="inline-flex items-center gap-2 px-3 py-3.5 text-sm font-bold text-[#8C6109] hover:text-[#1F2937]">Explore services <ChevronRight size={17} /></a></div></div><div className="mt-20 grid max-w-3xl grid-cols-2 gap-6 border-t border-[#E5E7EB] pt-5 text-xs uppercase tracking-[.14em] text-[#4B5563] md:grid-cols-4"><div><strong className="block font-mono text-2xl text-[#1F2937]">360°</strong>Development cycle</div><div><strong className="block font-mono text-2xl text-[#1F2937]">8+</strong>Core capabilities</div><div><strong className="block font-mono text-2xl text-[#1F2937]">01</strong>Technical partner</div><div><strong className="block font-mono text-2xl text-[#1F2937]">∞</strong>Room to improve</div></div></div>
+      <section className="relative border-b border-[#E5E7EB] bg-gradient-to-br from-[#FFFFFF] via-[#FFFDF9] to-[#FEF8EB]/50 overflow-hidden">
+        {/* Soft Ambient Light Glows matching the warm factory lighting in the image */}
+        <div className="pointer-events-none absolute -right-10 top-0 h-[550px] w-[550px] rounded-full bg-gradient-to-bl from-[#F8B526]/12 via-[#FCD580]/8 to-transparent blur-[100px]" />
+        <div className="pointer-events-none absolute right-[25%] top-[20%] h-[350px] w-[350px] rounded-full bg-[#F8B526]/8 blur-[80px]" />
+
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="grid items-center gap-6 pt-4 pb-2 lg:min-h-[500px] lg:grid-cols-12 lg:pt-6 lg:pb-0">
+            {/* Left Content Column */}
+            <div className="z-10 lg:col-span-5 xl:col-span-5">
+              <div className="flex items-center gap-3">
+                <span className="inline-block h-[2px] w-8 bg-[#F8B526]" />
+                <span className="text-[13px] font-medium text-[#4B5563]">
+                  Engineering consultancy · Sri Lanka
+                </span>
+              </div>
+              <h1 className="mt-5 text-[clamp(3rem,5.4vw,5.6rem)] font-extrabold leading-[.92] tracking-[-.04em] text-[#111827]">
+                Engineered<br />
+                <span className="text-[#F8B526]">to perform.</span>
+              </h1>
+              <p className="mt-5 max-w-md text-base leading-relaxed text-[#4B5563] md:text-[17px]">
+                Transforming complex industrial bottlenecks into robust, production-ready systems through advanced simulation, precision mechatronics, and custom automation.
+              </p>
+
+              <div className="mt-7 flex flex-wrap items-center gap-6">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2.5 rounded bg-[#F8B526] px-6 py-3 text-sm font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow-md"
+                >
+                  Get in touch <ArrowUpRight size={18} />
+                </a>
+                <a
+                  href="#capabilities"
+                  className="inline-flex items-center gap-1.5 py-3 text-sm font-bold text-[#1F2937] transition-colors hover:text-[#B37D0C]"
+                >
+                  Explore services <ChevronRight size={17} />
+                </a>
+              </div>
+            </div>
+
+            {/* Right Engineer Workstation Column with Soft Edge Fade */}
+            <div className="relative z-0 -mr-6 sm:-mr-10 lg:-mr-16 lg:col-span-7 xl:col-span-7 lg:-ml-12 xl:-ml-16 self-end">
+              <div className="relative w-full [mask-image:radial-gradient(ellipse_92%_88%_at_52%_50%,black_65%,transparent_100%)]">
+                <Image
+                  src="/hero.png"
+                  alt="RUGENX Engineer working on 3D CAD simulation and industrial automation workstation"
+                  width={1376}
+                  height={768}
+                  priority
+                  className="h-auto w-full object-contain"
+                  sizes="(max-width: 1024px) 100vw, 70vw"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Key Metrics Strip with Slogan */}
+          <div className="mt-10 flex flex-col justify-between gap-6 border-t border-[#E5E7EB] py-6 md:flex-row md:items-center">
+            <div className="grid grid-cols-2 gap-8 text-xs uppercase tracking-[.14em] text-[#4B5563] sm:grid-cols-4 md:gap-12">
+              <div>
+                <strong className="block font-mono text-2xl font-bold text-[#111827]">360°</strong>
+                Development cycle
+              </div>
+              <div>
+                <strong className="block font-mono text-2xl font-bold text-[#111827]">8+</strong>
+                Core capabilities
+              </div>
+              <div>
+                <strong className="block font-mono text-2xl font-bold text-[#111827]">01</strong>
+                Technical partner
+              </div>
+              <div>
+                <strong className="block font-mono text-2xl font-bold text-[#111827]">∞</strong>
+                Room to improve
+              </div>
+            </div>
+
+            {/* Partnering for a Smarter Tomorrow Slogan */}
+            <div className="hidden items-center gap-3 lg:flex">
+              <span className="h-px w-8 bg-[#F8B526]"></span>
+              <span className="text-xs font-medium tracking-wide text-[#6B7280]">
+                Partnering for a Smarter Tomorrow
+              </span>
+              <span className="h-px w-8 bg-[#F8B526]"></span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="about" className="relative overflow-hidden border-y border-[#E5E7EB] bg-white py-24 lg:py-32">
@@ -168,7 +316,7 @@ export default function Page() {
             {/* Left Column (Sticky) */}
             <div className="lg:col-span-7 lg:pr-12 xl:pr-16">
               <div className="sticky top-32">
-                
+
                 <h2 className="mt-6 text-5xl font-semibold leading-[1.1] tracking-[-.06em] md:text-6xl/tight">
                   Practical ideas.<br />
                   <span className="text-[#8C6109]">Engineered well.</span>
@@ -235,7 +383,7 @@ export default function Page() {
               <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">The technical depth<br /><span className="text-[#8C6109]">to move forward.</span></h2>
             </div>
             <div className="flex flex-col items-start gap-6 md:items-end">
-              
+
               {/* Carousel Controls */}
               <div className="flex gap-2 hidden md:flex">
                 <button
@@ -361,11 +509,10 @@ export default function Page() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveIndustryCategory(tab.id)}
-                  className={`border px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#F8B526] ${
-                    activeIndustryCategory === tab.id
-                      ? 'border-[#1F2937] bg-[#1F2937] text-[#F8B526] shadow-sm'
-                      : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#FCD580] hover:text-[#1F2937]'
-                  }`}
+                  className={`border px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#F8B526] ${activeIndustryCategory === tab.id
+                    ? 'border-[#1F2937] bg-[#1F2937] text-[#F8B526] shadow-sm'
+                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#FCD580] hover:text-[#1F2937]'
+                    }`}
                 >
                   {tab.label}
                 </button>
@@ -382,11 +529,10 @@ export default function Page() {
               return (
                 <div
                   key={item.number}
-                  className={`group relative flex flex-col justify-between overflow-hidden border bg-white p-7 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_35px_rgba(248,181,38,0.12)] ${
-                    isMatched
-                      ? 'border-[#E5E7EB] opacity-100 hover:border-[#F8B526]'
-                      : 'border-[#E5E7EB]/50 opacity-40 grayscale-[40%] hover:opacity-90 hover:grayscale-0'
-                  } ${item.isCta ? 'border-[#FCD580] bg-gradient-to-br from-white via-[#FEFCF7] to-[#FEEAB3]/30' : ''}`}
+                  className={`group relative flex flex-col justify-between overflow-hidden border bg-white p-7 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_35px_rgba(248,181,38,0.12)] ${isMatched
+                    ? 'border-[#E5E7EB] opacity-100 hover:border-[#F8B526]'
+                    : 'border-[#E5E7EB]/50 opacity-40 grayscale-[40%] hover:opacity-90 hover:grayscale-0'
+                    } ${item.isCta ? 'border-[#FCD580] bg-gradient-to-br from-white via-[#FEFCF7] to-[#FEEAB3]/30' : ''}`}
                 >
                   {/* Top gold accent line */}
                   <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
@@ -429,25 +575,99 @@ export default function Page() {
                   </div>
 
                   {/* Bottom action link */}
-                  
+
                 </div>
               )
             })}
           </div>
 
           {/* Bottom Trust/Stats Strip */}
-          
+
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32"><div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]"><div><p className="eyebrow">Innovation / 05</p><h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">Focused on<br /><span className="text-[#8C6109]">what's next.</span></h2></div><div className="grid gap-3 sm:grid-cols-2">{focusAreas.map((area, index) => <div key={area} className="flex items-center gap-4 border border-[#E5E7EB] bg-[#FEFCF7] p-5"><span className="font-mono text-xs text-[#B37D0C]">0{index + 1}</span><span className="text-sm font-semibold">{area}</span></div>)}</div></div></section>
+      {/* Innovation / Strategic Focus Areas */}
+      <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
+        <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <p className="eyebrow flex items-center gap-3">
+              <span className="h-px w-8 bg-[#F8B526]"></span>
+              Innovation / 05
+            </p>
+            <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
+              Focused on<br />
+              <span className="text-[#8C6109]">what's next.</span>
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
+              We continually build multidisciplinary technical capabilities to address emerging industrial requirements across processing, automation, and sustainable manufacturing.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {focusAreas.map((area, index) => (
+              <div
+                key={area}
+                className="group flex items-center gap-4 border border-[#E5E7EB] bg-[#FEFCF7] p-5 transition-all duration-300 hover:border-[#F8B526] hover:bg-white hover:shadow-sm"
+              >
+                <span className="font-mono text-xs font-bold text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
+                  0{index + 1}
+                </span>
+                <span className="text-sm font-semibold text-[#1F2937]">{area}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Engagement Models Section */}
+      <section id="engagement" className="border-t border-[#E5E7EB] bg-[#FEFCF7] py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="mb-16 max-w-2xl">
+            <p className="eyebrow flex items-center gap-3">
+              <span className="h-px w-8 bg-[#F8B526]"></span>
+              Engagement / 06
+            </p>
+            <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
+              Flexible models.<br />
+              <span className="text-[#8C6109]">Tailored to your needs.</span>
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
+              Whether you need end-to-end turnkey machinery or dedicated external R&amp;D engineering support, we adapt to fit your project milestones.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {engagementModels.map((model) => (
+              <div
+                key={model.number}
+                className="group relative flex flex-col justify-between overflow-hidden border border-[#E5E7EB] bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:shadow-[0_12px_30px_rgba(248,181,38,0.1)]"
+              >
+                <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                      {model.number}
+                    </span>
+                    <Handshake size={20} className="text-[#B37D0C]/60 transition-colors group-hover:text-[#F8B526]" />
+                  </div>
+                  <h3 className="mt-6 text-lg font-semibold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                    {model.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-[#4B5563]">
+                    {model.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section id="leadership" className="border-y border-[#E5E7EB] bg-[#FFFFFF]">
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
           <div className="mb-16">
             <p className="eyebrow flex items-center gap-3">
               <span className="h-px w-8 bg-[#F8B526]"></span>
-              Leadership / 06
+              Leadership / 07
             </p>
             <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
               Led by <span className="text-[#8C6109]">engineers.</span>
@@ -546,7 +766,7 @@ export default function Page() {
               <p className="mt-1 text-xs text-white/60">
                 Share your requirements. Our technical leads will review and respond within 24 hours.
               </p>
-              <form action="mailto:rugenxinnovations@gmail.com" method="post" enctype="text/plain" className="mt-6 space-y-4">
+              <form action="mailto:rugenxinnovations@gmail.com" method="post" encType="text/plain" className="mt-6 space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Your Name</label>
@@ -628,6 +848,8 @@ export default function Page() {
                   <li><a href="#about" className="transition-colors hover:text-white">About Us</a></li>
                   <li><a href="#capabilities" className="transition-colors hover:text-white">Services</a></li>
                   <li><a href="#industries" className="transition-colors hover:text-white">Industries</a></li>
+                  <li><a href="#engagement" className="transition-colors hover:text-white">Engagement Models</a></li>
+                  <li><a href="#leadership" className="transition-colors hover:text-white">Leadership</a></li>
                   <li><a href="#contact" className="transition-colors hover:text-white">Contact</a></li>
                 </ul>
               </div>
