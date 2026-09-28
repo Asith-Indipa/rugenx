@@ -458,9 +458,13 @@ export default function Page() {
             {/* Founder 1 */}
             <div className="group">
               <div className="mb-8 flex items-center gap-6">
-                {/* Image Placeholder */}
-                <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#E5E7EB] bg-[#FEFCF7] shadow-sm transition-all duration-500 ease-out group-hover:border-[#F8B526]">
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#B37D0C]/50">Photo</span>
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-[#E5E7EB] shadow-md transition-all duration-500 ease-out group-hover:border-[#F8B526]">
+                  <Image
+                    src="/kolitha.jpg"
+                    alt="Kolitha Indrachapa Thuduhena"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">Kolitha Indrachapa Thuduhena</h3>
@@ -480,9 +484,13 @@ export default function Page() {
             {/* Founder 2 */}
             <div className="group">
               <div className="mb-8 flex items-center gap-6">
-                {/* Image Placeholder */}
-                <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#E5E7EB] bg-[#FEFCF7] shadow-sm transition-all duration-500 ease-out group-hover:border-[#F8B526]">
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#B37D0C]/50">Photo</span>
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-[#E5E7EB] shadow-md transition-all duration-500 ease-out group-hover:border-[#F8B526]">
+                  <Image
+                    src="/harshana.jpg"
+                    alt="Harshana Laknath Subasinghe"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">Harshana Laknath Subasinghe</h3>
@@ -504,21 +512,89 @@ export default function Page() {
 
       <section id="contact" className="bg-[#1F2937] text-white">
         <div className="mx-auto max-w-7xl px-6 pt-24 lg:px-10 lg:pt-32">
-          <div className="grid gap-12 lg:grid-cols-[1fr_.7fr] lg:items-end">
-            <div>
+          <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
+            <div className="lg:col-span-5">
               <p className="eyebrow text-[#F8B526]">Start a conversation / 07</p>
-              <h2 className="mt-5 max-w-3xl text-5xl font-semibold tracking-[-.07em] md:text-7xl">
+              <h2 className="mt-5 text-4xl font-semibold tracking-[-.07em] sm:text-5xl md:text-6xl">
                 Let's engineer<br />
                 <span className="text-[#F8B526]">the future together.</span>
               </h2>
-            </div>
-            <div>
-              <p className="text-sm leading-7 text-white/70">
-                Have a technical challenge, product idea or process ready to improve? Tell us where to start.
+              <p className="mt-6 text-sm leading-7 text-white/70">
+                Have a technical challenge, product idea or process ready to improve? Connect with our engineering team directly or send an inquiry.
               </p>
-              <a href="mailto:rugenxinnovations@gmail.com" className="mt-7 inline-flex items-center gap-3 border-b border-[#F8B526] pb-2 text-sm font-bold text-[#F8B526] transition-colors hover:text-white">
-                rugenxinnovations@gmail.com <ArrowUpRight size={17} />
-              </a>
+              <div className="mt-8 space-y-4 text-sm text-white/80">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">📍</span>
+                  <span>563/C, Nawagamuwa South, Ranala, Sri Lanka</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">📞</span>
+                  <a href="tel:+94741850060" className="hover:text-[#F8B526] transition-colors">+94 74 18 500 60</a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">✉️</span>
+                  <a href="mailto:rugenxinnovations@gmail.com" className="text-[#F8B526] hover:text-white transition-colors">rugenxinnovations@gmail.com</a>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Engineering Inquiry Form */}
+            <div className="rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm lg:col-span-7">
+              <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-[#F8B526]">
+                Submit an Engineering Inquiry
+              </h3>
+              <p className="mt-1 text-xs text-white/60">
+                Share your requirements. Our technical leads will review and respond within 24 hours.
+              </p>
+              <form action="mailto:rugenxinnovations@gmail.com" method="post" enctype="text/plain" className="mt-6 space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Your Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      placeholder="e.g. John Perera"
+                      className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="name@company.com"
+                      className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Project Scope / Technical Domain</label>
+                  <input
+                    type="text"
+                    name="scope"
+                    placeholder="e.g. Industrial Automation / CFD Simulation / Custom Machinery"
+                    className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Challenge or Objective Details</label>
+                  <textarea
+                    name="details"
+                    rows={4}
+                    required
+                    placeholder="Briefly describe your industrial requirement, product concept, or operational bottleneck..."
+                    className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none resize-none"
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  className="mt-2 inline-flex items-center gap-2 rounded bg-[#F8B526] px-6 py-3 text-xs font-bold uppercase tracking-widest text-[#1F2937] transition-all hover:bg-[#D99A0F] hover:shadow-lg"
+                >
+                  Send Inquiry <ArrowUpRight size={16} />
+                </button>
+              </form>
             </div>
           </div>
 
