@@ -167,36 +167,42 @@ const developmentAreas = [
     title: 'Automated Processing Systems',
     description: 'Development of automated systems for food and agricultural processing.',
     icon: Factory,
+    tag: 'Automation & Processing',
   },
   {
     number: '02',
     title: 'Drying & Dehydration Technologies',
     description: 'Engineering of controlled drying systems with temperature, humidity, time, and process monitoring.',
     icon: DryingIcon,
+    tag: 'Thermal & Process Control',
   },
   {
     number: '03',
     title: 'Grinding & Powder Processing',
     description: 'Development of grinding, milling, material handling, collection, and packaging systems.',
     icon: Cog,
+    tag: 'Milling & Solids Handling',
   },
   {
     number: '04',
     title: 'Waste Plastic Processing',
     description: 'Development and integration of systems for plastic sorting, processing, recycling, and material recovery.',
     icon: Recycle,
+    tag: 'Recycling & Resource Recovery',
   },
   {
     number: '05',
     title: 'Industrial Monitoring',
     description: 'Sensor-based systems for monitoring industrial parameters and equipment performance.',
     icon: SensorWavesIcon,
+    tag: 'IIoT & Real-Time Telemetry',
   },
   {
     number: '06',
     title: 'Custom Machinery',
     description: 'Design and development of machinery according to specific industrial requirements.',
     icon: CrossedToolsIcon,
+    tag: 'Custom Engineered Systems',
   },
 ]
 
@@ -259,11 +265,75 @@ const engagementModels = [
 
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState('top')
   const [activeCapability, setActiveCapability] = useState(0)
   const [itemsPerView, setItemsPerView] = useState(4)
   const [activeIndustryCategory, setActiveIndustryCategory] = useState('all')
   const [activeIndustry, setActiveIndustry] = useState(0)
   const [industryItemsPerView, setIndustryItemsPerView] = useState(4)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+
+      const sectionIds = ['contact', 'leadership', 'engagement', 'rd', 'industries', 'work', 'capabilities', 'about', 'top']
+      const scrollPosition = window.scrollY + 140
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          const top = rect.top + window.scrollY
+          if (scrollPosition >= top) {
+            if (id === 'engagement' || id === 'rd') {
+              setActiveSection('rd')
+            } else if (id === 'work' || id === 'capabilities') {
+              setActiveSection('capabilities')
+            } else if (id === 'leadership' || id === 'contact') {
+              setActiveSection('contact')
+            } else {
+              setActiveSection(id)
+            }
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault()
+      const targetId = href.replace('#', '')
+      if (targetId === 'top') {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        setActiveSection('top')
+        window.history.pushState(null, '', '#top')
+        setMenuOpen(false)
+        return
+      }
+
+      const el = document.getElementById(targetId)
+      if (el) {
+        const headerOffset = 76
+        const elementPosition = el.getBoundingClientRect().top
+        const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth',
+        })
+        setActiveSection(targetId)
+        window.history.pushState(null, '', href)
+      }
+      setMenuOpen(false)
+    }
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -304,11 +374,31 @@ export default function Page() {
     activeIndustryCategory === 'all' ? true : item.category.includes(activeIndustryCategory as any)
   )
 
+  const navLinks = [
+    { name: 'Home', href: '#top', id: 'top' },
+    { name: 'About', href: '#about', id: 'about' },
+    { name: 'Services', href: '#capabilities', id: 'capabilities' },
+    { name: 'Projects', href: '#industries', id: 'industries' },
+    { name: 'R&D', href: '#rd', id: 'rd' },
+    { name: 'Contact', href: '#contact', id: 'contact' },
+  ]
+
   return (
-    <main id="top" className="min-h-screen overflow-hidden bg-[#FFFFFF] text-[#1F2937]">
-      <header className="sticky top-0 z-50 border-b border-[#E5E7EB]/80 bg-[#FFFFFF]/95 backdrop-blur">
+    <div id="top" className="min-h-screen bg-[#FFFFFF] text-[#1F2937]">
+      <header
+        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? 'border-[#E5E7EB] bg-white/95 shadow-sm backdrop-blur-md'
+            : 'border-[#E5E7EB]/80 bg-white/95 backdrop-blur'
+        }`}
+      >
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-          <a href="#top" className="flex items-center gap-3" aria-label="RUGENX home">
+          <a
+            href="#top"
+            onClick={(e) => handleNavClick(e, '#top')}
+            className="flex items-center gap-3"
+            aria-label="RUGENX home"
+          >
             <Image
               src="/rugenx-logo.png"
               alt="RUGENX (PVT) LTD. ENGINEERED TO PERFORM"
@@ -319,16 +409,28 @@ export default function Page() {
             />
           </a>
           <div className="hidden items-center gap-8 text-[13px] font-medium text-[#4B5563] lg:flex">
-            <a href="#top" className="border-b-2 border-[#F8B526] pb-1 font-semibold text-[#1F2937]">Home</a>
-            <a href="#about" className="transition-colors hover:text-[#D99A0F]">About</a>
-            <a href="#capabilities" className="transition-colors hover:text-[#D99A0F]">Services</a>
-            <a href="#industries" className="transition-colors hover:text-[#D99A0F]">Projects</a>
-            <a href="#engagement" className="transition-colors hover:text-[#D99A0F]">R&amp;D</a>
-            <a href="#contact" className="transition-colors hover:text-[#D99A0F]">Contact</a>
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.id
+              return (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={`pb-1 transition-colors ${
+                    isActive
+                      ? 'border-b-2 border-[#F8B526] font-semibold text-[#1F2937]'
+                      : 'border-b-2 border-transparent text-[#4B5563] hover:text-[#D99A0F]'
+                  }`}
+                >
+                  {link.name}
+                </a>
+              )
+            })}
           </div>
           <a
             href="#contact"
-            className="hidden items-center gap-2 rounded-full bg-[#F8B526] px-6 py-2.5 text-xs font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow sm:inline-flex"
+            onClick={(e) => handleNavClick(e, '#contact')}
+            className="hidden items-center gap-2 rounded bg-[#F8B526] px-6 py-2.5 text-xs font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow sm:inline-flex"
           >
             Get in Touch <ArrowRight size={14} />
           </a>
@@ -337,16 +439,26 @@ export default function Page() {
         {menuOpen && (
           <div className="border-t border-[#E5E7EB] bg-white px-6 py-5 lg:hidden">
             <div className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest">
-              <a href="#top" onClick={() => setMenuOpen(false)}>Home</a>
-              <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
-              <a href="#capabilities" onClick={() => setMenuOpen(false)}>Services</a>
-              <a href="#industries" onClick={() => setMenuOpen(false)}>Projects</a>
-              <a href="#engagement" onClick={() => setMenuOpen(false)}>R&amp;D</a>
-              <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+              {navLinks.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={`transition-colors ${
+                    activeSection === link.id
+                      ? 'text-[#D99A0F]'
+                      : 'text-[#4B5563] hover:text-[#1F2937]'
+                  }`}
+                >
+                  {link.name}
+                </a>
+              ))}
             </div>
           </div>
         )}
       </header>
+
+      <main className="overflow-x-clip">
 
       <section className="relative border-b border-[#E5E7EB] bg-gradient-to-br from-[#FFFFFF] via-[#FFFDF9] to-[#FEF8EB]/50 overflow-hidden">
         {/* Soft Ambient Light Glows matching the warm factory lighting in the image */}
@@ -848,10 +960,10 @@ export default function Page() {
                       style={{ width: `${100 / industryItemsPerView}%` }}
                       className="shrink-0 p-2 sm:p-2.5"
                     >
-                      <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-5 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-6">
+                      <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-2 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-2 rounded">
                         <div>
                           {/* Card Image */}
-                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-[#E5E7EB]">
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded bg-[#E5E7EB]">
                             <Image
                               src={item.image}
                               alt={item.title}
@@ -926,103 +1038,157 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Development Areas / Focused on what's next */}
-      <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
-        <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:gap-14">
-          {/* Left Column: Heading, Subtitle & Large Development Visual */}
-          <div className="flex flex-col justify-between h-full">
-            <div>
+      {/* Research & Development / Strategic Development Areas */}
+      <section id="rd" className="relative scroll-mt-20 overflow-hidden border-y border-[#E5E7EB] bg-white py-24 lg:py-32">
+        <div id="r-and-d" className="absolute -top-20" />
+        {/* Subtle decorative glow matching hero and industries */}
+        <div className="pointer-events-none absolute -right-24 top-0 h-96 w-96 rounded-full bg-[#FCD580]/10 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -left-24 bottom-0 h-96 w-96 rounded-full bg-[#F8B526]/5 blur-3xl" aria-hidden="true" />
+
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+          {/* Top Row: Left Header & Subtitle + Right Engineering Visual */}
+          <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
+            {/* Left Column: Heading, Subtitle & Callout */}
+            <div className="lg:col-span-5 xl:col-span-5">
               <p className="eyebrow flex items-center gap-3">
-                <span className="h-px w-8 bg-[#F8B526]"></span>
-                Development Areas / 05
+                <span className="h-px w-8 bg-[#F8B526]" />
+                Research &amp; Development / 05
               </p>
               <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
                 Focused on<br />
-                <span className="text-[#8C6109]">what's next.</span>
+                <span className="text-[#8C6109]">what&apos;s next.</span>
               </h2>
               <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
-                RUGENX is building capabilities across emerging industrial technologies and practical engineering applications.
+                RUGENX functions as an externalized R&amp;D partner—transforming early research, physical prototypes, and emerging technologies into proven, production-grade industrial machinery.
               </p>
+              <div className="mt-8 flex flex-wrap items-center gap-5">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 rounded bg-[#F8B526] px-5 py-3 text-xs font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow"
+                >
+                  Start an R&amp;D Project <ArrowRight size={14} />
+                </a>
+                <a
+                  href="#engagement"
+                  className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#B37D0C] transition-colors hover:text-[#8C6109]"
+                >
+                  Engagement Models <ArrowRight size={13} />
+                </a>
+              </div>
             </div>
 
-            {/* Large Engineering Visual on Left Side */}
-            <div className="relative mt-8 overflow-hidden rounded-2xl">
-              <div className="relative h-[280px] w-full sm:h-[340px] md:h-[380px] lg:h-[400px]">
+            {/* Right Column: Large Engineering Visual (aligned with Services and Industries) */}
+            <div className="relative lg:col-span-7 xl:col-span-7">
+              <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
                 <Image
                   src="/development-areas-engineer.png"
-                  alt="Automation and mechatronics engineer testing custom processing machinery"
+                  alt="Automation and mechatronics engineer testing custom processing machinery in R&D laboratory"
                   fill
-                  className="object-contain object-left-bottom"
-                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  className="object-contain object-right lg:object-cover"
+                  sizes="(max-width: 1024px) 100vw, 60vw"
                   priority
                 />
+                {/* Soft gradient edge overlays for seamless background blending */}
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white via-white/70 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent" />
               </div>
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {developmentAreas.map((item) => (
-              <div
-                key={item.number}
-                className="group relative flex flex-col justify-between rounded-2xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_10px_25px_rgba(248,181,38,0.1)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
-                    {item.number}
-                  </span>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F8B526] bg-[#FEFCF7] text-[#B37D0C] shadow-sm transition-all duration-300 group-hover:border-[#F8B526] group-hover:bg-[#FDF9F0] group-hover:scale-105">
-                    <item.icon className="h-4 w-4" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h3 className="text-base font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Technology & Engineering Capabilities - Compact Visual Strip */}
-        <div className="mt-14 rounded-2xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 md:p-8">
-          <div className="flex flex-col justify-between gap-3 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center">
-            <div className="flex items-center gap-2.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#F8B526]" />
+          {/* Sub-header Bar (matching Services & Industries section rhythm) */}
+          <div className="mt-14 flex items-center justify-between border-t border-[#E5E7EB] pt-6">
+            <div className="flex items-center gap-3">
+              <span className="h-2 w-2 rounded-full bg-[#F8B526]" />
               <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-                Technology &amp; Engineering Capabilities
+                Strategic Development Focus
+              </span>
+              <span className="hidden font-mono text-[11px] text-[#9CA3AF] sm:inline">
+                · 06 Applied Technology Domains
               </span>
             </div>
-            <span className="font-mono text-[11px] text-[#9CA3AF]">
-              Core Tooling &amp; Infrastructure
+            <span className="hidden font-mono text-[11px] uppercase tracking-wider text-[#B37D0C] sm:inline">
+              Prototype Rigs · Pilot Systems
             </span>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {techCapabilities.map((cap) => (
-              <div key={cap.category} className="group flex flex-col justify-start">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#F8B526]/80 bg-white text-[#B37D0C] shadow-sm transition-colors group-hover:border-[#F8B526] group-hover:text-[#8C6109]">
-                    <cap.icon className="h-3.5 w-3.5" />
-                  </div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
-                    {cap.category}
-                  </h4>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-[#4B5563]">
-                  {cap.skills.map((skill, idx) => (
-                    <span key={skill} className="inline-flex items-center gap-1.5">
-                      <span>{skill}</span>
-                      {idx < cap.skills.length - 1 && (
-                        <span className="select-none font-bold text-[#B37D0C]/60">·</span>
-                      )}
+          {/* 6 Strategic Development Areas Grid: 3 columns x 2 rows */}
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {developmentAreas.map((item) => (
+              <div
+                key={item.number}
+                className="group relative flex flex-col justify-between border border-[#E5E7EB] bg-[#FEFCF7] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#FCD580] hover:bg-white hover:shadow-[0_12px_28px_rgba(248,181,38,0.12)]"
+              >
+                {/* Top Accent Hover Line (matching How We Work & Engagement cards) */}
+                <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
+                
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
+                      {item.number}
                     </span>
-                  ))}
+                    <div className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#B37D0C] shadow-sm transition-all duration-300 group-hover:border-[#F8B526] group-hover:bg-[#FEFCF7] group-hover:text-[#8C6109] group-hover:scale-105">
+                      <item.icon className="h-4 w-4" />
+                    </div>
+                  </div>
+
+                  <h3 className="mt-5 text-base font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-2.5 text-[13px] leading-relaxed text-[#4B5563]">
+                    {item.description}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between border-t border-[#E5E7EB]/70 pt-4">
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF] transition-colors group-hover:text-[#B37D0C]">
+                    {item.tag || 'R&D Focus'}
+                  </span>
+                  <ArrowUpRight size={14} className="text-[#9CA3AF] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#F8B526]" />
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Technology & Engineering Capabilities Strip */}
+          <div className="mt-14 border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 md:p-8">
+            <div className="flex flex-col justify-between gap-3 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#F8B526]" />
+                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                  Technology &amp; Engineering Tooling
+                </span>
+              </div>
+              <span className="font-mono text-[11px] text-[#9CA3AF]">
+                Multidisciplinary Infrastructure &amp; CAE Suite
+              </span>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {techCapabilities.map((cap) => (
+                <div key={cap.category} className="group flex flex-col justify-start">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center border border-[#F8B526]/80 bg-white text-[#B37D0C] shadow-sm transition-colors group-hover:border-[#F8B526] group-hover:text-[#8C6109]">
+                      <cap.icon className="h-3.5 w-3.5" />
+                    </div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
+                      {cap.category}
+                    </h4>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-[#4B5563]">
+                    {cap.skills.map((skill, idx) => (
+                      <span key={skill} className="inline-flex items-center gap-1.5">
+                        <span className="transition-colors hover:text-[#1F2937]">{skill}</span>
+                        {idx < cap.skills.length - 1 && (
+                          <span className="select-none font-bold text-[#B37D0C]/60">·</span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -1257,6 +1423,7 @@ export default function Page() {
                   <li><a href="#about" className="transition-colors hover:text-white">About Us</a></li>
                   <li><a href="#capabilities" className="transition-colors hover:text-white">Services</a></li>
                   <li><a href="#industries" className="transition-colors hover:text-white">Industries</a></li>
+                  <li><a href="#rd" className="transition-colors hover:text-white">Research &amp; Development</a></li>
                   <li><a href="#engagement" className="transition-colors hover:text-white">Engagement Models</a></li>
                   <li><a href="#leadership" className="transition-colors hover:text-white">Leadership</a></li>
                   <li><a href="#contact" className="transition-colors hover:text-white">Contact</a></li>
@@ -1299,6 +1466,7 @@ export default function Page() {
           </footer>
         </div>
       </section>
-    </main>
+      </main>
+    </div>
   )
 }
