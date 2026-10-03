@@ -400,11 +400,11 @@ export default function Page() {
             aria-label="RUGENX home"
           >
             <Image
-              src="/rugenx-logo.png"
+              src="icon.png"
               alt="RUGENX (PVT) LTD. ENGINEERED TO PERFORM"
               width={180}
               height={48}
-              className="h-10 w-auto object-contain"
+              className="h-12 w-auto object-contain"
               priority
             />
           </a>
