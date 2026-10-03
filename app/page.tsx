@@ -8,6 +8,7 @@ import {
   Box,
   ChevronLeft,
   ChevronRight,
+  Cog,
   Cpu,
   Factory,
   FlaskConical,
@@ -27,92 +28,201 @@ import {
 } from 'lucide-react'
 
 const capabilities = [
-  ['01', 'Engineering Consultancy', 'Technical analysis, problem solving and decision support.', Gauge],
-  ['02', 'Product Development', 'From concept architecture to production-ready design.', Box],
-  ['03', 'R&D and Innovation', 'Feasibility studies, experimental development and testing.', FlaskConical],
-  ['04', 'CAE & Simulation', 'CFD, FEA and thermal analysis before you build.', Settings2],
-  ['05', 'Industrial Automation', 'Sensor-led monitoring, controls and connected machines.', Cpu],
-  ['06', 'Process Optimisation', 'Improve productivity, energy efficiency and quality.', Zap],
-  ['07', 'Prototyping & Testing', 'Functional prototypes, test rigs and validation.', Wrench],
-  ['08', 'Manufacturing Support', 'Fabrication drawings, suppliers and commissioning.', Factory],
+  ['01', 'Engineering Consultancy', 'Technical analysis, problem solving and engineering decision support.', Gauge],
+  ['02', 'Product Development', 'From concept development to production-ready engineered products.', Box],
+  ['03', 'Research & Development', 'New technologies, machinery, processes and customised engineering solutions.', FlaskConical],
+  ['04', 'CAE & Simulation', 'Evaluate and optimise designs before physical manufacturing.', Settings2],
+  ['05', 'Industrial Automation', 'Automation, monitoring, control and intelligent industrial systems.', Cpu],
+  ['06', 'Product & Process Optimisation', 'Improve products, machinery and manufacturing processes.', Zap],
+  ['07', 'Prototyping & Testing', 'Develop prototypes and validate engineering concepts.', Wrench],
+  ['08', 'Manufacturing Support', 'Support fabrication, assembly, commissioning and implementation.', Factory],
 ] as const
 
 const industries = [
   {
     number: '01',
-    title: 'Manufacturing & Production',
-    category: ['all', 'manufacturing', 'automation'],
-    description: 'Custom machinery, high-speed production systems, process debottlenecking, and fabrication support.',
+    title: 'Manufacturing',
+    category: ['all', 'manufacturing'],
+    description: 'Machinery, production systems, process optimisation, automation and engineering support.',
     icon: Factory,
-    tags: ['Machinery Design', 'Line Automation', 'OEE Optimisation', 'Fabrication'],
+    image: '/industry-manufacturing.jpg',
+    tags: ['Machinery', 'Production Systems', 'Process Optimisation', 'Automation', 'Engineering Support'],
   },
   {
     number: '02',
     title: 'Food & Agro Processing',
-    category: ['all', 'processing', 'rd'],
-    description: 'Controlled drying, dehydration technologies, grinding, pulverising, and hygienic process automation.',
+    category: ['all', 'processing'],
+    description: 'Processing machinery, drying systems, grinding systems and automation.',
     icon: Wheat,
-    tags: ['Drying & Dehydration', 'Grinding Systems', 'Process Control', 'Sanitary Rigs'],
+    image: '/industry-food-agro.jpg',
+    tags: ['Processing Machinery', 'Drying Systems', 'Grinding Systems', 'Automation'],
   },
   {
     number: '03',
-    title: 'Waste & Recycling Tech',
+    title: 'Waste Management & Recycling',
     category: ['all', 'processing'],
-    description: 'Plastic sorting and shredding lines, material recovery facilities, and resource recovery technologies.',
+    description: 'Recycling systems, material processing and resource recovery.',
     icon: Recycle,
-    tags: ['Plastic Recycling', 'Material Recovery', 'Sorting Systems', 'Circular Tech'],
+    image: '/industry-waste-recycling.jpg',
+    tags: ['Recycling Systems', 'Material Processing', 'Resource Recovery'],
   },
   {
     number: '04',
-    title: 'Industrial Automation & IoT',
-    category: ['all', 'automation', 'manufacturing'],
-    description: 'PLC architectures, sensor integration, machine-to-cloud telemetry, and predictive condition monitoring.',
+    title: 'Industrial Automation',
+    category: ['all', 'automation'],
+    description: 'Automated machinery, sensor systems, monitoring and control.',
     icon: Cpu,
-    tags: ['PLC & SCADA', 'Industrial IoT', 'Sensor Networks', 'Telemetry'],
+    image: '/industry-automation.jpg',
+    tags: ['Automated Machinery', 'Sensor Systems', 'Monitoring & Control'],
   },
   {
     number: '05',
     title: 'Energy & Thermal Systems',
     category: ['all', 'processing', 'automation'],
-    description: 'Heat exchangers, combustion and drying thermal analysis, waste heat recovery, and energy audits.',
+    description: 'Thermal equipment, heat transfer systems and energy optimisation.',
     icon: Thermometer,
-    tags: ['Heat Transfer', 'Thermal CFD', 'Waste Heat Recovery', 'Energy Audits'],
+    image: '/industry-energy-thermal.jpg',
+    tags: ['Thermal Equipment', 'Heat Transfer', 'Energy Optimisation'],
   },
   {
     number: '06',
-    title: 'Automotive & Transport',
+    title: 'Automotive & Transportation',
     category: ['all', 'manufacturing'],
-    description: 'Structural and fatigue CAE analysis, EV subsystem packaging, drivetrain components, and test rigs.',
+    description: 'Engineering analysis, product development and mechanical systems.',
     icon: Gauge,
-    tags: ['FEA & CFD Analysis', 'EV Subsystems', 'Rapid Prototyping', 'Structural Design'],
+    image: '/industry-automotive-transport.jpg',
+    tags: ['Engineering Analysis', 'Product Development', 'Mechanical Systems'],
   },
   {
     number: '07',
-    title: 'SMEs & Emerging Startups',
+    title: 'SMEs & Startups',
     category: ['all', 'rd'],
-    description: 'Fractional engineering leadership, proof-of-concept builds, CAD/CAM drafting, and fast-track scaling.',
+    description: 'Product development, prototype development, engineering consultancy and external R&D.',
     icon: Box,
-    tags: ['Fractional R&D', 'POC to MVP', 'Design Support', 'Supplier Sourcing'],
-  },
-  {
-    number: '08',
-    title: 'Custom & Bespoke Sectors',
-    category: ['all', 'manufacturing', 'rd'],
-    description: 'Multidisciplinary engineering for non-standard requirements, specialised test rigs, and novel industrial tech.',
-    icon: Sparkles,
-    tags: ['Custom Machinery', 'Test Rigs', 'Turnkey Solutions', 'Feasibility Studies'],
-    isCta: true,
+    image: '/industry-smes-startups.jpg',
+    tags: ['Product Development', 'Prototype Development', 'Engineering Consultancy', 'External R&D'],
   },
 ] as const
 
-const focusAreas = [
-  'Automated processing systems',
-  'Drying & dehydration technologies',
-  'Grinding & powder processing',
-  'Waste plastic processing',
-  'Industrial monitoring',
-  'Custom machinery',
+function DryingIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M7 4.5c1.2 2.2-1.2 4.4 0 6.6 1.2 2.2-1.2 4.4 0 6.6" />
+      <path d="M12 4.5c1.2 2.2-1.2 4.4 0 6.6 1.2 2.2-1.2 4.4 0 6.6" />
+      <path d="M17 4.5c1.2 2.2-1.2 4.4 0 6.6 1.2 2.2-1.2 4.4 0 6.6" />
+    </svg>
+  )
+}
+
+function SensorWavesIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      <path d="M16 8.5a5 5 0 0 1 0 7" />
+      <path d="M8 15.5a5 5 0 0 1 0-7" />
+      <path d="M19 5.5a9 9 0 0 1 0 13" />
+      <path d="M5 18.5a9 9 0 0 1 0-13" />
+    </svg>
+  )
+}
+
+function CrossedToolsIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M14.7 10.3 19.5 5.5a2.5 2.5 0 0 0-3.5-3.5l-5 5" />
+      <path d="m3.5 20.5 7.1-7.1" />
+      <path d="m20.5 20.5-7.1-7.1" />
+      <path d="m8.9 4.9-5 5a2.8 2.8 0 0 0 4 4l5-5" />
+    </svg>
+  )
+}
+
+const developmentAreas = [
+  {
+    number: '01',
+    title: 'Automated Processing Systems',
+    description: 'Development of automated systems for food and agricultural processing.',
+    icon: Factory,
+  },
+  {
+    number: '02',
+    title: 'Drying & Dehydration Technologies',
+    description: 'Engineering of controlled drying systems with temperature, humidity, time, and process monitoring.',
+    icon: DryingIcon,
+  },
+  {
+    number: '03',
+    title: 'Grinding & Powder Processing',
+    description: 'Development of grinding, milling, material handling, collection, and packaging systems.',
+    icon: Cog,
+  },
+  {
+    number: '04',
+    title: 'Waste Plastic Processing',
+    description: 'Development and integration of systems for plastic sorting, processing, recycling, and material recovery.',
+    icon: Recycle,
+  },
+  {
+    number: '05',
+    title: 'Industrial Monitoring',
+    description: 'Sensor-based systems for monitoring industrial parameters and equipment performance.',
+    icon: SensorWavesIcon,
+  },
+  {
+    number: '06',
+    title: 'Custom Machinery',
+    description: 'Design and development of machinery according to specific industrial requirements.',
+    icon: CrossedToolsIcon,
+  },
 ]
+
+const techCapabilities = [
+  {
+    category: 'Digital Engineering',
+    skills: ['3D CAD', 'CAD/CAM', 'Digital Prototyping'],
+    icon: Box,
+  },
+  {
+    category: 'Simulation',
+    skills: ['CFD', 'FEA', 'Thermal', 'Structural', 'Flow Analysis'],
+    icon: Gauge,
+  },
+  {
+    category: 'Automation',
+    skills: ['Sensors', 'PLC', 'Microcontrollers', 'Industrial IoT'],
+    icon: Cpu,
+  },
+  {
+    category: 'Manufacturing',
+    skills: ['Fabrication', 'Machining', 'Sheet Metal', 'Assembly'],
+    icon: Factory,
+  },
+] as const
+
 
 const engagementModels = [
   {
@@ -150,14 +260,26 @@ const engagementModels = [
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeCapability, setActiveCapability] = useState(0)
-  const [itemsPerView, setItemsPerView] = useState(3)
+  const [itemsPerView, setItemsPerView] = useState(4)
   const [activeIndustryCategory, setActiveIndustryCategory] = useState('all')
+  const [activeIndustry, setActiveIndustry] = useState(0)
+  const [industryItemsPerView, setIndustryItemsPerView] = useState(4)
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) setItemsPerView(3)
-      else if (window.innerWidth >= 768) setItemsPerView(2)
-      else setItemsPerView(1)
+      if (window.innerWidth >= 1200) {
+        setItemsPerView(4)
+        setIndustryItemsPerView(4)
+      } else if (window.innerWidth >= 1024) {
+        setItemsPerView(3)
+        setIndustryItemsPerView(3)
+      } else if (window.innerWidth >= 640) {
+        setItemsPerView(2)
+        setIndustryItemsPerView(2)
+      } else {
+        setItemsPerView(1)
+        setIndustryItemsPerView(1)
+      }
     }
 
     // Set initial
@@ -177,6 +299,10 @@ export default function Page() {
 
     return () => clearInterval(timer)
   }, [itemsPerView])
+
+  const filteredIndustries = industries.filter((item) =>
+    activeIndustryCategory === 'all' ? true : item.category.includes(activeIndustryCategory as any)
+  )
 
   return (
     <main id="top" className="min-h-screen overflow-hidden bg-[#FFFFFF] text-[#1F2937]">
@@ -228,7 +354,7 @@ export default function Page() {
         <div className="pointer-events-none absolute right-[25%] top-[20%] h-[350px] w-[350px] rounded-full bg-[#F8B526]/8 blur-[80px]" />
 
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="grid items-center gap-6 pt-4 pb-2 lg:min-h-[500px] lg:grid-cols-12 lg:pt-6 lg:pb-0">
+          <div className="grid items-center gap-8 py-10 lg:min-h-[520px] lg:grid-cols-12 lg:py-14">
             {/* Left Content Column */}
             <div className="z-10 lg:col-span-5 xl:col-span-5">
               <div className="flex items-center gap-3">
@@ -241,22 +367,22 @@ export default function Page() {
                 Engineered<br />
                 <span className="text-[#F8B526]">to perform.</span>
               </h1>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-[#4B5563] md:text-[17px]">
-                Transforming complex industrial bottlenecks into robust, production-ready systems through advanced simulation, precision mechatronics, and custom automation.
+              <p className="mt-5 max-w-lg text-base leading-relaxed text-[#4B5563] md:text-[17px]">
+                Engineering and industrial technology solutions that transform ideas and technical challenges into practical, reliable, and production-ready outcomes.
               </p>
 
-              <div className="mt-7 flex flex-wrap items-center gap-6">
+              <div className="mt-8 flex flex-wrap items-center gap-6">
                 <a
                   href="#contact"
-                  className="inline-flex items-center gap-2.5 rounded bg-[#F8B526] px-6 py-3 text-sm font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow-md"
+                  className="inline-flex items-center gap-2.5 rounded bg-[#F8B526] px-6 py-3.5 text-sm font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow-md"
                 >
-                  Get in touch <ArrowUpRight size={18} />
+                  Start a Project <ArrowRight size={16} />
                 </a>
                 <a
                   href="#capabilities"
-                  className="inline-flex items-center gap-1.5 py-3 text-sm font-bold text-[#1F2937] transition-colors hover:text-[#B37D0C]"
+                  className="inline-flex items-center gap-2 py-3.5 text-sm font-bold text-[#1F2937] transition-colors hover:text-[#B37D0C]"
                 >
-                  Explore services <ChevronRight size={17} />
+                  Explore Services <ArrowRight size={16} />
                 </a>
               </div>
             </div>
@@ -276,37 +402,6 @@ export default function Page() {
               </div>
             </div>
           </div>
-
-          {/* Key Metrics Strip with Slogan */}
-          <div className="mt-10 flex flex-col justify-between gap-6 border-t border-[#E5E7EB] py-6 md:flex-row md:items-center">
-            <div className="grid grid-cols-2 gap-8 text-xs uppercase tracking-[.14em] text-[#4B5563] sm:grid-cols-4 md:gap-12">
-              <div>
-                <strong className="block font-mono text-2xl font-bold text-[#111827]">360°</strong>
-                Development cycle
-              </div>
-              <div>
-                <strong className="block font-mono text-2xl font-bold text-[#111827]">8+</strong>
-                Core capabilities
-              </div>
-              <div>
-                <strong className="block font-mono text-2xl font-bold text-[#111827]">01</strong>
-                Technical partner
-              </div>
-              <div>
-                <strong className="block font-mono text-2xl font-bold text-[#111827]">∞</strong>
-                Room to improve
-              </div>
-            </div>
-
-            {/* Partnering for a Smarter Tomorrow Slogan */}
-            <div className="hidden items-center gap-3 lg:flex">
-              <span className="h-px w-8 bg-[#F8B526]"></span>
-              <span className="text-xs font-medium tracking-wide text-[#6B7280]">
-                Partnering for a Smarter Tomorrow
-              </span>
-              <span className="h-px w-8 bg-[#F8B526]"></span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -316,14 +411,22 @@ export default function Page() {
             {/* Left Column (Sticky) */}
             <div className="lg:col-span-7 lg:pr-12 xl:pr-16">
               <div className="sticky top-32">
+                <p className="eyebrow flex items-center gap-3">
+                  <span className="h-px w-8 bg-[#F8B526]" />
+                  About RUGENX / 01
+                </p>
 
                 <h2 className="mt-6 text-5xl font-semibold leading-[1.1] tracking-[-.06em] md:text-6xl/tight">
                   Practical ideas.<br />
                   <span className="text-[#8C6109]">Engineered well.</span>
                 </h2>
 
-                <p className="mt-10 text-xl font-light leading-relaxed tracking-[-.01em] text-[#1F2937] md:text-2xl md:leading-[1.6]">
-                  <strong className="font-semibold text-[#8C6109]">RUGENX</strong> is an engineering consultancy and industrial technology solutions company based in Sri Lanka. We combine design, simulation, research, automation, prototyping and manufacturing expertise to turn difficult technical problems into dependable outcomes.
+                <p className="mt-8 text-lg font-light leading-relaxed tracking-[-.01em] text-[#1F2937] md:text-xl md:leading-[1.6]">
+                  <strong className="font-semibold text-[#8C6109]">RUGENX Pvt Ltd</strong> is an engineering and industrial technology solutions company dedicated to transforming ideas, technical challenges and industrial requirements into practical, reliable and production-ready engineering outcomes.
+                </p>
+
+                <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
+                  From concept and engineering development to validation, implementation and continuous improvement, we work as a technical extension of our clients' teams.
                 </p>
               </div>
             </div>
@@ -338,7 +441,7 @@ export default function Page() {
                     <Target size={28} strokeWidth={1.5} className="mb-6 text-[#D99A0F]" />
                     <h3 className="font-mono text-sm font-bold tracking-widest text-[#B37D0C] uppercase">Our Vision</h3>
                     <p className="mt-4 text-[15px] leading-relaxed text-[#4B5563]">
-                      A future where locally relevant engineering makes industry more productive, resilient and sustainable.
+                      To become a leading engineering and industrial technology solutions company, delivering innovative, reliable, and sustainable solutions for the industries of tomorrow.
                     </p>
                   </div>
                   <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full"></div>
@@ -376,35 +479,77 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="capabilities" className="border-y border-[#E5E7EB] bg-[#FEFCF7]">
-        <div className="mx-auto max-w-7xl px-6 pt-5 pb-24 lg:px-10 lg:pt-10 lg:pb-32">
-          <div className="mb-14 flex flex-col justify-between gap-7 md:flex-row md:items-end">
-            <div>
-              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">The technical depth<br /><span className="text-[#8C6109]">to move forward.</span></h2>
+      <section id="capabilities" className="relative border-y border-[#E5E7EB] bg-[#FEFCF7]">
+        <div className="mx-auto max-w-7xl px-6 pt-12 pb-24 lg:px-10 lg:pt-16 lg:pb-32">
+          {/* Top Row: Left Header & Subtitle + Right Engineering Visual */}
+          <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
+            {/* Left Column: Heading & Intro */}
+            <div className="lg:col-span-5 xl:col-span-5">
+              <p className="eyebrow flex items-center gap-3">
+                <span className="h-px w-8 bg-[#F8B526]" />
+                Services &amp; Capabilities / 02
+              </p>
+              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
+                The technical depth<br />
+                <span className="text-[#8C6109]">to move forward.</span>
+              </h2>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-[#4B5563]">
+                From concept to production, RUGENX provides integrated engineering services that help you design, develop and optimise solutions for a more efficient and sustainable future.
+              </p>
             </div>
-            <div className="flex flex-col items-start gap-6 md:items-end">
 
-              {/* Carousel Controls */}
-              <div className="flex gap-2 hidden md:flex">
-                <button
-                  onClick={() => setActiveCapability((prev) => (prev === 0 ? capabilities.length - itemsPerView : prev - 1))}
-                  className="flex h-12 w-12 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
-                  aria-label="Previous capabilities"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button
-                  onClick={() => setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))}
-                  className="flex h-12 w-12 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
-                  aria-label="Next capabilities"
-                >
-                  <ChevronRight size={20} />
-                </button>
+            {/* Right Column: Large Engineering Visual */}
+            <div className="relative lg:col-span-7 xl:col-span-7">
+              <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
+                <Image
+                  src="/services-cad-engineer.png"
+                  alt="Professional mechanical engineer analyzing 3D CAD turbine and simulation at industrial workstation"
+                  fill
+                  className="object-contain object-right lg:object-cover"
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  priority
+                />
+                {/* Soft gradient edge overlays for seamless background blending */}
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FEFCF7] via-[#FEFCF7]/70 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FEFCF7] to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FEFCF7]/60 to-transparent" />
               </div>
             </div>
           </div>
 
-          <div className="relative mx-auto mt-14 w-full">
+          {/* Sub-header / Carousel Controls Bar */}
+          <div className="mt-12 flex items-center justify-between border-t border-[#E5E7EB]/80 pt-6">
+            <div className="flex items-center gap-3">
+              <span className="h-2 w-2 rounded-full bg-[#F8B526]" />
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                Core Practice Areas
+              </span>
+              <span className="hidden font-mono text-[11px] text-[#9CA3AF] sm:inline">
+                · 08 Specialized Disciplines
+              </span>
+            </div>
+
+            {/* Desktop Navigation Arrows */}
+            <div className="hidden items-center gap-2 md:flex">
+              <button
+                onClick={() => setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))}
+                className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+                aria-label="Previous capabilities"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))}
+                className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+                aria-label="Next capabilities"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Service Cards Carousel */}
+          <div className="relative mx-auto mt-6 w-full">
             <div className="overflow-hidden">
               <div
                 className="flex transition-transform duration-700 ease-in-out"
@@ -417,21 +562,21 @@ export default function Page() {
                       key={number}
                       aria-hidden={!isActive}
                       style={{ width: `${100 / itemsPerView}%` }}
-                      className="shrink-0 p-2 md:p-3"
+                      className="shrink-0 p-2 md:p-2.5"
                     >
-                      <div className="group relative flex h-full min-h-[320px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-[#FFFFFF] p-8 transition-colors hover:border-[#FCD580] hover:bg-[#FEFCF7] focus-within:ring-2 focus-within:ring-[#F8B526]">
-                        <div className="absolute right-0 top-0 h-0 w-0 border-l-[32px] border-t-[32px] border-l-transparent border-t-[#F8B526] opacity-0 transition-opacity group-hover:opacity-100" />
+                      <div className="group relative flex h-full min-h-[290px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-[#FFFFFF] p-7 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_8px_20px_rgba(248,181,38,0.08)] focus-within:ring-2 focus-within:ring-[#F8B526]">
+                        <div className="absolute right-0 top-0 h-0 w-0 border-l-[28px] border-t-[28px] border-l-transparent border-t-[#F8B526] opacity-0 transition-opacity group-hover:opacity-100" />
                         <div>
                           <div className="flex items-start justify-between">
-                            <span className="font-mono text-sm tracking-widest text-[#B37D0C]">{number}</span>
-                            <Icon size={26} strokeWidth={1.5} className="text-[#9CA3AF] transition-colors group-hover:text-[#F8B526]" />
+                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">{number}</span>
+                            <Icon size={22} strokeWidth={1.5} className="text-[#9CA3AF] transition-colors group-hover:text-[#F8B526]" />
                           </div>
-                          <h3 className="mt-12 text-2xl font-semibold tracking-[-.04em] text-[#1F2937] md:text-3xl lg:text-[1.75rem]">{title}</h3>
-                          <p className="mt-4 text-[15px] leading-relaxed text-[#4B5563]">{description}</p>
+                          <h3 className="mt-7 text-xl font-semibold tracking-[-.03em] text-[#1F2937] transition-colors group-hover:text-[#8C6109] md:text-2xl">{title}</h3>
+                          <p className="mt-3 text-xs leading-relaxed text-[#4B5563]">{description}</p>
                         </div>
-                        <div className="mt-10 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#4B5563] transition-colors group-hover:text-[#8C6109]">
-                          <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">Learn more </a>
-                          <ArrowUpRight size={16} className="relative z-10" />
+                        <div className="mt-8 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#4B5563] transition-colors group-hover:text-[#8C6109]">
+                          <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">LEARN MORE</a>
+                          <ArrowUpRight size={14} className="relative z-10" />
                         </div>
                       </div>
                     </div>
@@ -441,9 +586,9 @@ export default function Page() {
             </div>
 
             {/* Mobile Controls & Dots */}
-            <div className="mt-10 flex items-center justify-between md:justify-center">
+            <div className="mt-8 flex items-center justify-between md:justify-center">
               <button
-                onClick={() => setActiveCapability((prev) => (prev === 0 ? capabilities.length - itemsPerView : prev - 1))}
+                onClick={() => setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
                 aria-label="Previous capabilities"
               >
@@ -473,7 +618,139 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="work" className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32"><div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]"><div><p className="eyebrow">How we work / 03</p><h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">Design.<br />Simulate.<br /><span className="text-[#8C6109]">Improve.</span></h2></div><div className="relative"><div className="absolute left-6 top-7 h-[calc(100%-55px)] w-px bg-[#FCD580]" />{[['01', 'Discover', 'Understand the challenge, the context and the opportunity.'], ['02', 'Develop', 'Design, simulate and refine the right technical solution.'], ['03', 'Deliver', 'Prototype, validate and support the path to production.'], ['04', 'Evolve', 'Measure results and keep improving what matters.']].map(([number, title, body]) => <div key={number} className="relative flex gap-7 pb-10 last:pb-0"><span className="z-10 flex h-12 w-12 shrink-0 items-center justify-center border border-[#FCD580] bg-[#FFFFFF] font-mono text-xs text-[#8C6109]">{number}</span><div><h3 className="text-2xl font-semibold tracking-[-.04em]">{title}</h3><p className="mt-2 max-w-md text-sm leading-6 text-[#4B5563]">{body}</p></div></div>)}</div></div></section>
+      {/* Engineering Process Section: Design. Simulate. Optimise. */}
+      <section id="work" className="relative border-y border-[#E5E7EB] bg-white py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+            {/* Left Column (Overview & Methodology Visual) */}
+            <div className="lg:col-span-5 lg:pr-4">
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <p className="eyebrow flex items-center gap-3">
+                    <span className="h-px w-8 bg-[#F8B526]" />
+                    Engineering Methodology / 03
+                  </p>
+
+                  <h2 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-.06em] text-[#1F2937] md:text-6xl">
+                    Design.<br />
+                    Simulate.<br />
+                    <span className="text-[#8C6109]">Optimise.</span>
+                  </h2>
+
+                  <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
+                    A disciplined, simulation-first engineering lifecycle that evaluates every physical parameter before committing to tooling and fabrication.
+                  </p>
+
+                  <div className="mt-8 border-t border-[#E5E7EB] pt-6">
+                    <a
+                      href="#contact"
+                      className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#B37D0C] transition-colors hover:text-[#1F2937]"
+                    >
+                      Discuss your engineering challenge <ArrowRight size={14} />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Large Engineering Methodology Visual */}
+                <div className="relative mt-8 overflow-hidden">
+                  <div className="relative h-[290px] w-full sm:h-[350px] md:h-[390px] lg:h-[430px] xl:h-[470px]">
+                    <Image
+                      src="/methodology-simulation-engineer.png"
+                      alt="Mechanical engineer analyzing 3D CAD turbine model and FEA simulation at industrial engineering workstation"
+                      fill
+                      className="object-contain object-left-bottom"
+                      sizes="(max-width: 1024px) 100vw, 45vw"
+                      priority
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column (Interactive Timeline Steps) */}
+            <div className="lg:col-span-7">
+              <div className="relative pl-4 sm:pl-8">
+                {/* Connecting Vertical Track */}
+                <div className="absolute left-[34px] sm:left-[50px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-[#F8B526] via-[#FCD580] to-[#E5E7EB]" />
+
+                <div className="space-y-8">
+                  {[
+                    {
+                      number: '01',
+                      title: 'Design',
+                      description: 'Understand the requirement and develop the engineering concept.',
+                      tag: 'Concept & 3D CAD',
+                      details: 'Requirements analysis, mechanical architecture, 3D CAD modeling, and design for manufacturability (DFM).',
+                      icon: Box,
+                    },
+                    {
+                      number: '02',
+                      title: 'Simulate',
+                      description: 'Evaluate performance using engineering simulation.',
+                      tag: 'CFD & FEA Analysis',
+                      details: 'Finite Element Analysis (FEA) for stress and deformation, plus Computational Fluid Dynamics (CFD) for airflow, thermal, and fluid flow.',
+                      icon: Settings2,
+                    },
+                    {
+                      number: '03',
+                      title: 'Optimise',
+                      description: 'Refine the design based on engineering analysis.',
+                      tag: 'Performance Tuning',
+                      details: 'Iterative optimization to maximize strength-to-weight ratio, improve energy efficiency, and prevent operational failure modes.',
+                      icon: Zap,
+                    },
+                    {
+                      number: '04',
+                      title: 'Manufacture',
+                      description: 'Move the validated solution toward physical implementation.',
+                      tag: 'Fabrication & Commissioning',
+                      details: 'Fabrication-ready drawings, supplier coordination, precision assembly, testing, and full production implementation.',
+                      icon: Factory,
+                    },
+                  ].map((step) => {
+                    const StepIcon = step.icon
+                    return (
+                      <div
+                        key={step.number}
+                        className="group relative flex gap-6 sm:gap-8 rounded-xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_12px_30px_rgba(248,181,38,0.12)]"
+                      >
+                        {/* Step Number & Icon Circle */}
+                        <div className="relative z-10 flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full border-2 border-[#F8B526] bg-white font-mono text-sm font-bold text-[#1F2937] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-[#F8B526] group-hover:text-white">
+                          <StepIcon size={20} className="text-[#B37D0C] transition-colors group-hover:text-[#1F2937]" />
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                              STEP {step.number}
+                            </span>
+                            <span className="rounded bg-white border border-[#E5E7EB] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#4B5563] transition-colors group-hover:border-[#FCD580] group-hover:text-[#B37D0C]">
+                              {step.tag}
+                            </span>
+                          </div>
+
+                          <h3 className="mt-2 text-xl font-bold tracking-tight text-[#1F2937] sm:text-2xl transition-colors group-hover:text-[#8C6109]">
+                            {step.title}
+                          </h3>
+
+                          <p className="mt-2 text-base font-medium text-[#1F2937]">
+                            {step.description}
+                          </p>
+
+                          <p className="mt-2 text-sm leading-relaxed text-[#4B5563]">
+                            {step.details}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section id="industries" className="relative overflow-hidden border-y border-[#E5E7EB] bg-[#FEFCF7] py-24 lg:py-32">
         {/* Subtle decorative background glows */}
@@ -481,137 +758,269 @@ export default function Page() {
         <div className="pointer-events-none absolute -left-24 bottom-0 h-96 w-96 rounded-full bg-[#F8B526]/10 blur-3xl" aria-hidden="true" />
 
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-          {/* Section Header */}
-          <div className="mb-14 flex flex-col justify-between gap-8 md:flex-row md:items-end lg:mb-16">
-            <div className="max-w-2xl">
+          {/* Top Row: Left Header & Filters + Right Engineering Visual */}
+          <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
+            {/* Left Column: Heading, Subtitle & Filter Tabs */}
+            <div className="lg:col-span-6 xl:col-span-5">
               <p className="eyebrow flex items-center gap-3">
                 <span className="h-px w-8 bg-[#F8B526]" />
-                Industries we serve / 04
+                Industries We Serve / 04
               </p>
-              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-6xl">
+              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
                 Useful in the<br />
                 <span className="text-[#8C6109]">real world.</span>
               </h2>
-              <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
+              <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
                 We combine domain-specific mechanical, thermal, and automation expertise to solve high-impact engineering challenges across core industrial sectors.
               </p>
+
+              {/* Filter Tabs */}
+              <div className="mt-8 flex flex-wrap gap-2">
+                {[
+                  { id: 'all', label: 'ALL INDUSTRIES' },
+                  { id: 'manufacturing', label: 'MANUFACTURING & AUTOMOTIVE' },
+                  { id: 'processing', label: 'PROCESSING & ENERGY' },
+                  { id: 'automation', label: 'AUTOMATION' },
+                  { id: 'rd', label: 'SMES & STARTUPS' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveIndustryCategory(tab.id)
+                      setActiveIndustry(0)
+                    }}
+                    className={`border px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#F8B526] ${
+                      activeIndustryCategory === tab.id
+                        ? 'border-[#1F2937] bg-[#1F2937] text-[#F8B526] shadow-sm'
+                        : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#FCD580] hover:text-[#1F2937]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Interactive Category Filter Tabs */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                { id: 'all', label: 'All Sectors' },
-                { id: 'manufacturing', label: 'Manufacturing' },
-                { id: 'processing', label: 'Processing & Food' },
-                { id: 'automation', label: 'Automation & Energy' },
-                { id: 'rd', label: 'R&D & Startups' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveIndustryCategory(tab.id)}
-                  className={`border px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#F8B526] ${activeIndustryCategory === tab.id
-                    ? 'border-[#1F2937] bg-[#1F2937] text-[#F8B526] shadow-sm'
-                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#FCD580] hover:text-[#1F2937]'
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            {/* Right Column: Large Engineering Visual */}
+            <div className="relative lg:col-span-6 xl:col-span-7">
+              <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
+                <Image
+                  src="/services-cad-engineer.png"
+                  alt="Industrial engineering testing and CAD simulation"
+                  fill
+                  className="object-contain object-right lg:object-cover"
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  priority
+                />
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FEFCF7] via-[#FEFCF7]/70 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FEFCF7] to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FEFCF7]/60 to-transparent" />
+              </div>
             </div>
           </div>
 
-          {/* Industry Cards Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {industries.map((item) => {
-              const isMatched = activeIndustryCategory === 'all' || item.category.includes(activeIndustryCategory as any)
-              const Icon = item.icon
+          {/* Carousel Slider with Left and Right Arrows */}
+          <div className="relative mt-14 flex items-center">
+            {/* Left Navigation Arrow */}
+            <button
+              onClick={() =>
+                setActiveIndustry((prev) =>
+                  prev === 0 ? Math.max(0, filteredIndustries.length - industryItemsPerView) : prev - 1
+                )
+              }
+              className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+              aria-label="Previous industries"
+            >
+              <ChevronLeft size={20} />
+            </button>
 
-              return (
-                <div
-                  key={item.number}
-                  className={`group relative flex flex-col justify-between overflow-hidden border bg-white p-7 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_35px_rgba(248,181,38,0.12)] ${isMatched
-                    ? 'border-[#E5E7EB] opacity-100 hover:border-[#F8B526]'
-                    : 'border-[#E5E7EB]/50 opacity-40 grayscale-[40%] hover:opacity-90 hover:grayscale-0'
-                    } ${item.isCta ? 'border-[#FCD580] bg-gradient-to-br from-white via-[#FEFCF7] to-[#FEEAB3]/30' : ''}`}
-                >
-                  {/* Top gold accent line */}
-                  <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
+            {/* Slider Viewport */}
+            <div className="mx-2 flex-1 overflow-hidden sm:mx-4">
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${activeIndustry * (100 / industryItemsPerView)}%)` }}
+              >
+                {filteredIndustries.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <div
+                      key={item.number}
+                      style={{ width: `${100 / industryItemsPerView}%` }}
+                      className="shrink-0 p-2 sm:p-2.5"
+                    >
+                      <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-5 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-6">
+                        <div>
+                          {/* Card Image */}
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-[#E5E7EB]">
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            />
+                          </div>
 
-                  {/* Corner geometric decoration */}
-                  <div className="absolute right-0 top-0 h-0 w-0 border-l-[28px] border-t-[28px] border-l-transparent border-t-[#FCD580]/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                          {/* Number & Icon */}
+                          <div className="mt-5 flex items-center justify-between">
+                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                              {item.number}
+                            </span>
+                            <div className="flex h-10 w-10 items-center justify-center border border-[#FCD580]/70 bg-[#FEFCF7] text-[#B37D0C] transition-colors group-hover:border-[#F8B526] group-hover:bg-[#F8B526] group-hover:text-[#1F2937]">
+                              <Icon size={20} strokeWidth={1.5} />
+                            </div>
+                          </div>
 
-                  <div>
-                    {/* Header inside Card: Number + Icon */}
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
-                        {item.number}
-                      </span>
-                      <div className="flex h-11 w-11 items-center justify-center border border-[#FCD580]/60 bg-[#FEFCF7] text-[#B37D0C] transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-3deg] group-hover:border-[#F8B526] group-hover:bg-[#F8B526] group-hover:text-[#1F2937] group-hover:shadow-sm">
-                        <Icon size={22} strokeWidth={1.75} />
+                          {/* Title */}
+                          <h3 className="mt-3 text-lg font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                            {item.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="mt-2 text-xs leading-relaxed text-[#4B5563]">
+                            {item.description}
+                          </p>
+                        </div>
+
+                        {/* Bottom Link */}
+                        <div className="mt-5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#B37D0C] transition-colors group-hover:text-[#1F2937]">
+                          <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">
+                            LEARN MORE
+                          </a>
+                          <ArrowUpRight size={14} className="relative z-10" />
+                        </div>
                       </div>
                     </div>
+                  )
+                })}
+              </div>
+            </div>
 
-                    {/* Title */}
-                    <h3 className="mt-8 text-xl font-semibold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
-                      {item.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="mt-3 text-[14px] leading-relaxed text-[#4B5563]">
-                      {item.description}
-                    </p>
-
-                    {/* Tag Pills */}
-                    <div className="mt-5 flex flex-wrap gap-1.5">
-                      {item.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="border border-[#E5E7EB] bg-[#FEFCF7] px-2 py-0.5 font-mono text-[10px] font-medium text-[#4B5563] transition-colors duration-200 group-hover:border-[#FCD580] group-hover:text-[#8C6109]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Bottom action link */}
-
-                </div>
-              )
-            })}
+            {/* Right Navigation Arrow */}
+            <button
+              onClick={() =>
+                setActiveIndustry((prev) =>
+                  prev >= filteredIndustries.length - industryItemsPerView ? 0 : prev + 1
+                )
+              }
+              className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+              aria-label="Next industries"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
 
-          {/* Bottom Trust/Stats Strip */}
-
+          {/* Dots Pagination */}
+          <div className="mt-8 flex justify-center gap-2">
+            {Array.from({ length: Math.max(1, filteredIndustries.length - industryItemsPerView + 1) }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveIndustry(idx)}
+                className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none ${
+                  activeIndustry === idx ? 'w-8 bg-[#F8B526]' : 'w-2 bg-[#E5E7EB] hover:bg-[#D1D5DB]'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Innovation / Strategic Focus Areas */}
+      {/* Development Areas / Focused on what's next */}
       <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
-        <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
-          <div>
-            <p className="eyebrow flex items-center gap-3">
-              <span className="h-px w-8 bg-[#F8B526]"></span>
-              Innovation / 05
-            </p>
-            <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
-              Focused on<br />
-              <span className="text-[#8C6109]">what's next.</span>
-            </h2>
-            <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
-              We continually build multidisciplinary technical capabilities to address emerging industrial requirements across processing, automation, and sustainable manufacturing.
-            </p>
+        <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:gap-14">
+          {/* Left Column: Heading, Subtitle & Large Development Visual */}
+          <div className="flex flex-col justify-between h-full">
+            <div>
+              <p className="eyebrow flex items-center gap-3">
+                <span className="h-px w-8 bg-[#F8B526]"></span>
+                Development Areas / 05
+              </p>
+              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
+                Focused on<br />
+                <span className="text-[#8C6109]">what's next.</span>
+              </h2>
+              <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
+                RUGENX is building capabilities across emerging industrial technologies and practical engineering applications.
+              </p>
+            </div>
+
+            {/* Large Engineering Visual on Left Side */}
+            <div className="relative mt-8 overflow-hidden rounded-2xl">
+              <div className="relative h-[280px] w-full sm:h-[340px] md:h-[380px] lg:h-[400px]">
+                <Image
+                  src="/development-areas-engineer.png"
+                  alt="Automation and mechatronics engineer testing custom processing machinery"
+                  fill
+                  className="object-contain object-left-bottom"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  priority
+                />
+              </div>
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {focusAreas.map((area, index) => (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {developmentAreas.map((item) => (
               <div
-                key={area}
-                className="group flex items-center gap-4 border border-[#E5E7EB] bg-[#FEFCF7] p-5 transition-all duration-300 hover:border-[#F8B526] hover:bg-white hover:shadow-sm"
+                key={item.number}
+                className="group relative flex flex-col justify-between rounded-2xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_10px_25px_rgba(248,181,38,0.1)]"
               >
-                <span className="font-mono text-xs font-bold text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
-                  0{index + 1}
-                </span>
-                <span className="text-sm font-semibold text-[#1F2937]">{area}</span>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
+                    {item.number}
+                  </span>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F8B526] bg-[#FEFCF7] text-[#B37D0C] shadow-sm transition-all duration-300 group-hover:border-[#F8B526] group-hover:bg-[#FDF9F0] group-hover:scale-105">
+                    <item.icon className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <h3 className="text-base font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Technology & Engineering Capabilities - Compact Visual Strip */}
+        <div className="mt-14 rounded-2xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 md:p-8">
+          <div className="flex flex-col justify-between gap-3 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#F8B526]" />
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                Technology &amp; Engineering Capabilities
+              </span>
+            </div>
+            <span className="font-mono text-[11px] text-[#9CA3AF]">
+              Core Tooling &amp; Infrastructure
+            </span>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {techCapabilities.map((cap) => (
+              <div key={cap.category} className="group flex flex-col justify-start">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#F8B526]/80 bg-white text-[#B37D0C] shadow-sm transition-colors group-hover:border-[#F8B526] group-hover:text-[#8C6109]">
+                    <cap.icon className="h-3.5 w-3.5" />
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
+                    {cap.category}
+                  </h4>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-[#4B5563]">
+                  {cap.skills.map((skill, idx) => (
+                    <span key={skill} className="inline-flex items-center gap-1.5">
+                      <span>{skill}</span>
+                      {idx < cap.skills.length - 1 && (
+                        <span className="select-none font-bold text-[#B37D0C]/60">·</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
