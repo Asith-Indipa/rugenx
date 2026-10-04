@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import {
   ArrowRight,
@@ -25,6 +25,9 @@ import {
   X,
   Zap,
   Handshake,
+  Mail,
+  MapPin,
+  Phone,
 } from 'lucide-react'
 
 const capabilities = [
@@ -263,9 +266,80 @@ const engagementModels = [
   },
 ] as const
 
+function RevealOnScroll({
+  children,
+  className = '',
+  delay = 0,
+  direction = 'up',
+  duration = 750,
+}: {
+  children: React.ReactNode
+  className?: string
+  delay?: number
+  direction?: 'up' | 'down' | 'left' | 'right' | 'none'
+  duration?: number
+}) {
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.unobserve(el)
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px',
+      }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const getTransform = () => {
+    if (isVisible) return 'translate3d(0, 0, 0)'
+    switch (direction) {
+      case 'up':
+        return 'translate3d(0, 32px, 0)'
+      case 'down':
+        return 'translate3d(0, -32px, 0)'
+      case 'left':
+        return 'translate3d(32px, 0, 0)'
+      case 'right':
+        return 'translate3d(-32px, 0, 0)'
+      default:
+        return 'translate3d(0, 0, 0)'
+    }
+  }
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        transform: getTransform(),
+        opacity: isVisible ? 1 : 0,
+        transition: `transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, opacity ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
+        willChange: 'transform, opacity',
+      }}
+      className={className}
+    >
+      {children}
+    </div>
+  )
+}
+
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [heroMounted, setHeroMounted] = useState(false)
   const [activeSection, setActiveSection] = useState('top')
   const [activeCapability, setActiveCapability] = useState(0)
   const [itemsPerView, setItemsPerView] = useState(4)
@@ -274,8 +348,18 @@ export default function Page() {
   const [industryItemsPerView, setIndustryItemsPerView] = useState(4)
 
   useEffect(() => {
+    setHeroMounted(true)
+  }, [])
+
+  useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
+
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      if (docHeight > 0) {
+        const progress = (window.scrollY / docHeight) * 100
+        setScrollProgress(Math.min(100, Math.max(0, progress)))
+      }
 
       const sectionIds = ['contact', 'leadership', 'engagement', 'rd', 'industries', 'work', 'capabilities', 'about', 'top']
       const scrollPosition = window.scrollY + 140
@@ -392,6 +476,14 @@ export default function Page() {
             : 'border-[#E5E7EB]/80 bg-white/95 backdrop-blur'
         }`}
       >
+        {/* Scroll Progress Bar */}
+        <div className="pointer-events-none absolute bottom-0 left-0 h-[2.5px] w-full overflow-hidden bg-transparent">
+          <div
+            className="h-full bg-gradient-to-r from-[#F8B526] via-[#E5A319] to-[#8C6109] transition-all duration-150 ease-out"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
           <a
             href="#top"
@@ -404,7 +496,7 @@ export default function Page() {
               alt="RUGENX (PVT) LTD. ENGINEERED TO PERFORM"
               width={180}
               height={48}
-              className="h-12 w-auto object-contain"
+              className="h-10 w-auto object-contain"
               priority
             />
           </a>
@@ -467,40 +559,62 @@ export default function Page() {
 
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid items-center gap-8 py-10 lg:min-h-[520px] lg:grid-cols-12 lg:py-14">
-            {/* Left Content Column */}
+            {/* Left Content Column with Staggered Entrance */}
             <div className="z-10 lg:col-span-5 xl:col-span-5">
-              <div className="flex items-center gap-3">
+              <div
+                className={`flex items-center gap-3 transition-all duration-700 ease-out ${
+                  heroMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                }`}
+              >
                 <span className="inline-block h-[2px] w-8 bg-[#F8B526]" />
                 <span className="text-[13px] font-medium text-[#4B5563]">
                   Engineering consultancy · Sri Lanka
                 </span>
               </div>
-              <h1 className="mt-5 text-[clamp(3rem,5.4vw,5.6rem)] font-extrabold leading-[.92] tracking-[-.04em] text-[#111827]">
+              <h1
+                className={`mt-5 text-[clamp(3rem,5.4vw,5.6rem)] font-extrabold leading-[.92] tracking-[-.04em] text-[#111827] transition-all duration-800 delay-100 ease-out ${
+                  heroMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                }`}
+              >
                 Engineered<br />
                 <span className="text-[#F8B526]">to perform.</span>
               </h1>
-              <p className="mt-5 max-w-lg text-base leading-relaxed text-[#4B5563] md:text-[17px]">
+              <p
+                className={`mt-5 max-w-lg text-base leading-relaxed text-[#4B5563] md:text-[17px] transition-all duration-800 delay-200 ease-out ${
+                  heroMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                }`}
+              >
                 Engineering and industrial technology solutions that transform ideas and technical challenges into practical, reliable, and production-ready outcomes.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-6">
+              <div
+                className={`mt-8 flex flex-wrap items-center gap-6 transition-all duration-800 delay-300 ease-out ${
+                  heroMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                }`}
+              >
                 <a
                   href="#contact"
-                  className="inline-flex items-center gap-2.5 rounded bg-[#F8B526] px-6 py-3.5 text-sm font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow-md"
+                  onClick={(e) => handleNavClick(e, '#contact')}
+                  className="inline-flex items-center gap-2.5 rounded bg-[#F8B526] px-6 py-3.5 text-sm font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Start a Project <ArrowRight size={16} />
                 </a>
                 <a
                   href="#capabilities"
-                  className="inline-flex items-center gap-2 py-3.5 text-sm font-bold text-[#1F2937] transition-colors hover:text-[#B37D0C]"
+                  onClick={(e) => handleNavClick(e, '#capabilities')}
+                  className="inline-flex items-center gap-2 py-3.5 text-sm font-bold text-[#1F2937] transition-all hover:text-[#B37D0C] hover:translate-x-1"
                 >
                   Explore Services <ArrowRight size={16} />
                 </a>
               </div>
             </div>
 
-            {/* Right Engineer Workstation Column with Soft Edge Fade */}
-            <div className="relative z-0 -mr-6 sm:-mr-10 lg:-mr-16 lg:col-span-7 xl:col-span-7 lg:-ml-12 xl:-ml-16 self-end">
+            {/* Right Engineer Workstation Column with Soft Edge Fade and Smooth Float Entrance */}
+            <div
+              className={`relative z-0 -mr-6 sm:-mr-10 lg:-mr-16 lg:col-span-7 xl:col-span-7 lg:-ml-12 xl:-ml-16 self-end transition-all duration-1000 delay-200 ease-out ${
+                heroMounted ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-8'
+              }`}
+            >
               <div className="relative w-full [mask-image:radial-gradient(ellipse_92%_88%_at_52%_50%,black_65%,transparent_100%)]">
                 <Image
                   src="/hero.png"
@@ -523,23 +637,25 @@ export default function Page() {
             {/* Left Column (Sticky) */}
             <div className="lg:col-span-7 lg:pr-12 xl:pr-16">
               <div className="sticky top-32">
-                <p className="eyebrow flex items-center gap-3">
-                  <span className="h-px w-8 bg-[#F8B526]" />
-                  About RUGENX / 01
-                </p>
+                <RevealOnScroll direction="up">
+                  <p className="eyebrow flex items-center gap-3">
+                    <span className="h-px w-8 bg-[#F8B526]" />
+                    About RUGENX / 01
+                  </p>
 
-                <h2 className="mt-6 text-5xl font-semibold leading-[1.1] tracking-[-.06em] md:text-6xl/tight">
-                  Practical ideas.<br />
-                  <span className="text-[#8C6109]">Engineered well.</span>
-                </h2>
+                  <h2 className="mt-6 text-5xl font-semibold leading-[1.1] tracking-[-.06em] md:text-6xl/tight">
+                    Practical ideas.<br />
+                    <span className="text-[#8C6109]">Engineered well.</span>
+                  </h2>
 
-                <p className="mt-8 text-lg font-light leading-relaxed tracking-[-.01em] text-[#1F2937] md:text-xl md:leading-[1.6]">
-                  <strong className="font-semibold text-[#8C6109]">RUGENX Pvt Ltd</strong> is an engineering and industrial technology solutions company dedicated to transforming ideas, technical challenges and industrial requirements into practical, reliable and production-ready engineering outcomes.
-                </p>
+                  <p className="mt-8 text-lg font-light leading-relaxed tracking-[-.01em] text-[#1F2937] md:text-xl md:leading-[1.6]">
+                    <strong className="font-semibold text-[#8C6109]">RUGENX Pvt Ltd</strong> is an engineering and industrial technology solutions company dedicated to transforming ideas, technical challenges and industrial requirements into practical, reliable and production-ready engineering outcomes.
+                  </p>
 
-                <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
-                  From concept and engineering development to validation, implementation and continuous improvement, we work as a technical extension of our clients' teams.
-                </p>
+                  <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
+                    From concept and engineering development to validation, implementation and continuous improvement, we work as a technical extension of our clients' teams.
+                  </p>
+                </RevealOnScroll>
               </div>
             </div>
 
@@ -547,44 +663,48 @@ export default function Page() {
             <div className="lg:col-span-5">
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
                 {/* Vision Card */}
-                <div className="group relative overflow-hidden border border-[#E5E7EB] bg-[#FEFCF7] p-8 transition-all duration-300 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1">
-                  <div className="absolute right-0 top-0 h-32 w-32 translate-x-12 -translate-y-12 rounded-full bg-[#FCD580]/15 transition-transform duration-700 group-hover:scale-[2.5]"></div>
-                  <div className="relative">
-                    <Target size={28} strokeWidth={1.5} className="mb-6 text-[#D99A0F]" />
-                    <h3 className="font-mono text-sm font-bold tracking-widest text-[#B37D0C] uppercase">Our Vision</h3>
-                    <p className="mt-4 text-[15px] leading-relaxed text-[#4B5563]">
-                      To become a leading engineering and industrial technology solutions company, delivering innovative, reliable, and sustainable solutions for the industries of tomorrow.
-                    </p>
+                <RevealOnScroll direction="up" delay={100}>
+                  <div className="group relative overflow-hidden border border-[#E5E7EB] bg-[#FEFCF7] p-8 transition-all duration-300 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1">
+                    <div className="absolute right-0 top-0 h-32 w-32 translate-x-12 -translate-y-12 rounded-full bg-[#FCD580]/15 transition-transform duration-700 group-hover:scale-[2.5]"></div>
+                    <div className="relative">
+                      <Target size={28} strokeWidth={1.5} className="mb-6 text-[#D99A0F]" />
+                      <h3 className="font-mono text-sm font-bold tracking-widest text-[#B37D0C] uppercase">Our Vision</h3>
+                      <p className="mt-4 text-[15px] leading-relaxed text-[#4B5563]">
+                        To become a leading engineering and industrial technology solutions company, delivering innovative, reliable, and sustainable solutions for the industries of tomorrow.
+                      </p>
+                    </div>
+                    <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full"></div>
                   </div>
-                  <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full"></div>
-                </div>
+                </RevealOnScroll>
 
                 {/* Commitment Card */}
-                <div className="group relative overflow-hidden border border-[#E5E7EB] bg-[#FEFCF7] p-8 transition-all duration-300 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1">
-                  <div className="absolute right-0 top-0 h-32 w-32 translate-x-12 -translate-y-12 rounded-full bg-[#FCD580]/15 transition-transform duration-700 group-hover:scale-[2.5]"></div>
-                  <div className="relative">
-                    <ShieldCheck size={28} strokeWidth={1.5} className="mb-6 text-[#D99A0F]" />
-                    <h3 className="font-mono text-sm font-bold tracking-widest text-[#B37D0C] uppercase">Our Commitment</h3>
-                    <ul className="mt-4 flex flex-col gap-3 text-[14px] leading-relaxed text-[#4B5563]">
-                      <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
-                        <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Solve a problem
-                      </li>
-                      <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
-                        <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Improve a process
-                      </li>
-                      <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
-                        <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Develop a technology
-                      </li>
-                      <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
-                        <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Create a product
-                      </li>
-                      <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
-                        <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Build a better future
-                      </li>
-                    </ul>
+                <RevealOnScroll direction="up" delay={250}>
+                  <div className="group relative overflow-hidden border border-[#E5E7EB] bg-[#FEFCF7] p-8 transition-all duration-300 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1">
+                    <div className="absolute right-0 top-0 h-32 w-32 translate-x-12 -translate-y-12 rounded-full bg-[#FCD580]/15 transition-transform duration-700 group-hover:scale-[2.5]"></div>
+                    <div className="relative">
+                      <ShieldCheck size={28} strokeWidth={1.5} className="mb-6 text-[#D99A0F]" />
+                      <h3 className="font-mono text-sm font-bold tracking-widest text-[#B37D0C] uppercase">Our Commitment</h3>
+                      <ul className="mt-4 flex flex-col gap-3 text-[14px] leading-relaxed text-[#4B5563]">
+                        <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
+                          <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Solve a problem
+                        </li>
+                        <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
+                          <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Improve a process
+                        </li>
+                        <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
+                          <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Develop a technology
+                        </li>
+                        <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
+                          <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Create a product
+                        </li>
+                        <li className="flex items-start gap-2 border-t border-[#E5E7EB] pt-3 group-hover:border-[#FCD580]/40 transition-colors">
+                          <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#F8B526]"></span> Build a better future
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full"></div>
                   </div>
-                  <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full"></div>
-                </div>
+                </RevealOnScroll>
               </div>
             </div>
           </div>
@@ -597,35 +717,39 @@ export default function Page() {
           <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
             {/* Left Column: Heading & Intro */}
             <div className="lg:col-span-5 xl:col-span-5">
-              <p className="eyebrow flex items-center gap-3">
-                <span className="h-px w-8 bg-[#F8B526]" />
-                Services &amp; Capabilities / 02
-              </p>
-              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
-                The technical depth<br />
-                <span className="text-[#8C6109]">to move forward.</span>
-              </h2>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-[#4B5563]">
-                From concept to production, RUGENX provides integrated engineering services that help you design, develop and optimise solutions for a more efficient and sustainable future.
-              </p>
+              <RevealOnScroll direction="up">
+                <p className="eyebrow flex items-center gap-3">
+                  <span className="h-px w-8 bg-[#F8B526]" />
+                  Services &amp; Capabilities / 02
+                </p>
+                <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
+                  The technical depth<br />
+                  <span className="text-[#8C6109]">to move forward.</span>
+                </h2>
+                <p className="mt-6 max-w-xl text-base leading-relaxed text-[#4B5563]">
+                  From concept to production, RUGENX provides integrated engineering services that help you design, develop and optimise solutions for a more efficient and sustainable future.
+                </p>
+              </RevealOnScroll>
             </div>
 
             {/* Right Column: Large Engineering Visual */}
             <div className="relative lg:col-span-7 xl:col-span-7">
-              <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
-                <Image
-                  src="/services-cad-engineer.png"
-                  alt="Professional mechanical engineer analyzing 3D CAD turbine and simulation at industrial workstation"
-                  fill
-                  className="object-contain object-right lg:object-cover"
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  priority
-                />
-                {/* Soft gradient edge overlays for seamless background blending */}
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FEFCF7] via-[#FEFCF7]/70 to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FEFCF7] to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FEFCF7]/60 to-transparent" />
-              </div>
+              <RevealOnScroll direction="left" delay={150}>
+                <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
+                  <Image
+                    src="/services-cad-engineer.png"
+                    alt="Professional mechanical engineer analyzing 3D CAD turbine and simulation at industrial workstation"
+                    fill
+                    className="object-contain object-right lg:object-cover"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    priority
+                  />
+                  {/* Soft gradient edge overlays for seamless background blending */}
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FEFCF7] via-[#FEFCF7]/70 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FEFCF7] to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FEFCF7]/60 to-transparent" />
+                </div>
+              </RevealOnScroll>
             </div>
           </div>
 
@@ -736,47 +860,50 @@ export default function Page() {
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             {/* Left Column (Overview & Methodology Visual) */}
             <div className="lg:col-span-5 lg:pr-4">
-              <div className="flex flex-col justify-between h-full">
-                <div>
-                  <p className="eyebrow flex items-center gap-3">
-                    <span className="h-px w-8 bg-[#F8B526]" />
-                    Engineering Methodology / 03
-                  </p>
+              <RevealOnScroll direction="up">
+                <div className="flex flex-col justify-between h-full">
+                  <div>
+                    <p className="eyebrow flex items-center gap-3">
+                      <span className="h-px w-8 bg-[#F8B526]" />
+                      Engineering Methodology / 03
+                    </p>
 
-                  <h2 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-.06em] text-[#1F2937] md:text-6xl">
-                    Design.<br />
-                    Simulate.<br />
-                    <span className="text-[#8C6109]">Optimise.</span>
-                  </h2>
+                    <h2 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-.06em] text-[#1F2937] md:text-6xl">
+                      Design.<br />
+                      Simulate.<br />
+                      <span className="text-[#8C6109]">Optimise.</span>
+                    </h2>
 
-                  <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
-                    A disciplined, simulation-first engineering lifecycle that evaluates every physical parameter before committing to tooling and fabrication.
-                  </p>
+                    <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
+                      A disciplined, simulation-first engineering lifecycle that evaluates every physical parameter before committing to tooling and fabrication.
+                    </p>
 
-                  <div className="mt-8 border-t border-[#E5E7EB] pt-6">
-                    <a
-                      href="#contact"
-                      className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#B37D0C] transition-colors hover:text-[#1F2937]"
-                    >
-                      Discuss your engineering challenge <ArrowRight size={14} />
-                    </a>
+                    <div className="mt-8 border-t border-[#E5E7EB] pt-6">
+                      <a
+                        href="#contact"
+                        onClick={(e) => handleNavClick(e, '#contact')}
+                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#B37D0C] transition-colors hover:text-[#1F2937]"
+                      >
+                        Discuss your engineering challenge <ArrowRight size={14} />
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Large Engineering Methodology Visual */}
+                  <div className="relative mt-8 overflow-hidden">
+                    <div className="relative h-[290px] w-full sm:h-[350px] md:h-[390px] lg:h-[430px] xl:h-[470px]">
+                      <Image
+                        src="/methodology-simulation-engineer.png"
+                        alt="Mechanical engineer analyzing 3D CAD turbine model and FEA simulation at industrial engineering workstation"
+                        fill
+                        className="object-contain object-left-bottom"
+                        sizes="(max-width: 1024px) 100vw, 45vw"
+                        priority
+                      />
+                    </div>
                   </div>
                 </div>
-
-                {/* Large Engineering Methodology Visual */}
-                <div className="relative mt-8 overflow-hidden">
-                  <div className="relative h-[290px] w-full sm:h-[350px] md:h-[390px] lg:h-[430px] xl:h-[470px]">
-                    <Image
-                      src="/methodology-simulation-engineer.png"
-                      alt="Mechanical engineer analyzing 3D CAD turbine model and FEA simulation at industrial engineering workstation"
-                      fill
-                      className="object-contain object-left-bottom"
-                      sizes="(max-width: 1024px) 100vw, 45vw"
-                      priority
-                    />
-                  </div>
-                </div>
-              </div>
+              </RevealOnScroll>
             </div>
 
             {/* Right Column (Interactive Timeline Steps) */}
@@ -819,42 +946,43 @@ export default function Page() {
                       details: 'Fabrication-ready drawings, supplier coordination, precision assembly, testing, and full production implementation.',
                       icon: Factory,
                     },
-                  ].map((step) => {
+                  ].map((step, idx) => {
                     const StepIcon = step.icon
                     return (
-                      <div
-                        key={step.number}
-                        className="group relative flex gap-6 sm:gap-8 rounded-xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_12px_30px_rgba(248,181,38,0.12)]"
-                      >
-                        {/* Step Number & Icon Circle */}
-                        <div className="relative z-10 flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full border-2 border-[#F8B526] bg-white font-mono text-sm font-bold text-[#1F2937] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-[#F8B526] group-hover:text-white">
-                          <StepIcon size={20} className="text-[#B37D0C] transition-colors group-hover:text-[#1F2937]" />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
-                              STEP {step.number}
-                            </span>
-                            <span className="rounded bg-white border border-[#E5E7EB] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#4B5563] transition-colors group-hover:border-[#FCD580] group-hover:text-[#B37D0C]">
-                              {step.tag}
-                            </span>
+                      <RevealOnScroll key={step.number} delay={idx * 120} direction="left">
+                        <div
+                          className="group relative flex gap-6 sm:gap-8 rounded-xl border border-[#E5E7EB] bg-[#FEFCF7] p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:bg-white hover:shadow-[0_12px_30px_rgba(248,181,38,0.12)]"
+                        >
+                          {/* Step Number & Icon Circle */}
+                          <div className="relative z-10 flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full border-2 border-[#F8B526] bg-white font-mono text-sm font-bold text-[#1F2937] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-[#F8B526] group-hover:text-white">
+                            <StepIcon size={20} className="text-[#B37D0C] transition-colors group-hover:text-[#1F2937]" />
                           </div>
 
-                          <h3 className="mt-2 text-xl font-bold tracking-tight text-[#1F2937] sm:text-2xl transition-colors group-hover:text-[#8C6109]">
-                            {step.title}
-                          </h3>
+                          {/* Content */}
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                                STEP {step.number}
+                              </span>
+                              <span className="rounded bg-white border border-[#E5E7EB] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#4B5563] transition-colors group-hover:border-[#FCD580] group-hover:text-[#B37D0C]">
+                                {step.tag}
+                              </span>
+                            </div>
 
-                          <p className="mt-2 text-base font-medium text-[#1F2937]">
-                            {step.description}
-                          </p>
+                            <h3 className="mt-2 text-xl font-bold tracking-tight text-[#1F2937] sm:text-2xl transition-colors group-hover:text-[#8C6109]">
+                              {step.title}
+                            </h3>
 
-                          <p className="mt-2 text-sm leading-relaxed text-[#4B5563]">
-                            {step.details}
-                          </p>
+                            <p className="mt-2 text-base font-medium text-[#1F2937]">
+                              {step.description}
+                            </p>
+
+                            <p className="mt-2 text-sm leading-relaxed text-[#4B5563]">
+                              {step.details}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      </RevealOnScroll>
                     )
                   })}
                 </div>
@@ -874,167 +1002,173 @@ export default function Page() {
           <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
             {/* Left Column: Heading, Subtitle & Filter Tabs */}
             <div className="lg:col-span-6 xl:col-span-5">
-              <p className="eyebrow flex items-center gap-3">
-                <span className="h-px w-8 bg-[#F8B526]" />
-                Industries We Serve / 04
-              </p>
-              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
-                Useful in the<br />
-                <span className="text-[#8C6109]">real world.</span>
-              </h2>
-              <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
-                We combine domain-specific mechanical, thermal, and automation expertise to solve high-impact engineering challenges across core industrial sectors.
-              </p>
+              <RevealOnScroll direction="up">
+                <p className="eyebrow flex items-center gap-3">
+                  <span className="h-px w-8 bg-[#F8B526]" />
+                  Industries We Serve / 04
+                </p>
+                <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
+                  Useful in the<br />
+                  <span className="text-[#8C6109]">real world.</span>
+                </h2>
+                <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
+                  We combine domain-specific mechanical, thermal, and automation expertise to solve high-impact engineering challenges across core industrial sectors.
+                </p>
 
-              {/* Filter Tabs */}
-              <div className="mt-8 flex flex-wrap gap-2">
-                {[
-                  { id: 'all', label: 'ALL INDUSTRIES' },
-                  { id: 'manufacturing', label: 'MANUFACTURING & AUTOMOTIVE' },
-                  { id: 'processing', label: 'PROCESSING & ENERGY' },
-                  { id: 'automation', label: 'AUTOMATION' },
-                  { id: 'rd', label: 'SMES & STARTUPS' },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveIndustryCategory(tab.id)
-                      setActiveIndustry(0)
-                    }}
-                    className={`border px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#F8B526] ${
-                      activeIndustryCategory === tab.id
-                        ? 'border-[#1F2937] bg-[#1F2937] text-[#F8B526] shadow-sm'
-                        : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#FCD580] hover:text-[#1F2937]'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+                {/* Filter Tabs */}
+                <div className="mt-8 flex flex-wrap gap-2">
+                  {[
+                    { id: 'all', label: 'ALL INDUSTRIES' },
+                    { id: 'manufacturing', label: 'MANUFACTURING & AUTOMOTIVE' },
+                    { id: 'processing', label: 'PROCESSING & ENERGY' },
+                    { id: 'automation', label: 'AUTOMATION' },
+                    { id: 'rd', label: 'SMES & STARTUPS' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveIndustryCategory(tab.id)
+                        setActiveIndustry(0)
+                      }}
+                      className={`border px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#F8B526] ${
+                        activeIndustryCategory === tab.id
+                          ? 'border-[#1F2937] bg-[#1F2937] text-[#F8B526] shadow-sm'
+                          : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#FCD580] hover:text-[#1F2937]'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </RevealOnScroll>
             </div>
 
             {/* Right Column: Large Engineering Visual */}
             <div className="relative lg:col-span-6 xl:col-span-7">
-              <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
-                <Image
-                  src="/services-cad-engineer.png"
-                  alt="Industrial engineering testing and CAD simulation"
-                  fill
-                  className="object-contain object-right lg:object-cover"
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  priority
-                />
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FEFCF7] via-[#FEFCF7]/70 to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FEFCF7] to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FEFCF7]/60 to-transparent" />
-              </div>
+              <RevealOnScroll direction="left" delay={150}>
+                <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
+                  <Image
+                    src="/services-cad-engineer.png"
+                    alt="Industrial engineering testing and CAD simulation"
+                    fill
+                    className="object-contain object-right lg:object-cover"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    priority
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FEFCF7] via-[#FEFCF7]/70 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FEFCF7] to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FEFCF7]/60 to-transparent" />
+                </div>
+              </RevealOnScroll>
             </div>
           </div>
 
           {/* Carousel Slider with Left and Right Arrows */}
-          <div className="relative mt-14 flex items-center">
-            {/* Left Navigation Arrow */}
-            <button
-              onClick={() =>
-                setActiveIndustry((prev) =>
-                  prev === 0 ? Math.max(0, filteredIndustries.length - industryItemsPerView) : prev - 1
-                )
-              }
-              className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
-              aria-label="Previous industries"
-            >
-              <ChevronLeft size={20} />
-            </button>
-
-            {/* Slider Viewport */}
-            <div className="mx-2 flex-1 overflow-hidden sm:mx-4">
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(-${activeIndustry * (100 / industryItemsPerView)}%)` }}
+          <RevealOnScroll direction="up" delay={200}>
+            <div className="relative mt-14 flex items-center">
+              {/* Left Navigation Arrow */}
+              <button
+                onClick={() =>
+                  setActiveIndustry((prev) =>
+                    prev === 0 ? Math.max(0, filteredIndustries.length - industryItemsPerView) : prev - 1
+                  )
+                }
+                className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+                aria-label="Previous industries"
               >
-                {filteredIndustries.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <div
-                      key={item.number}
-                      style={{ width: `${100 / industryItemsPerView}%` }}
-                      className="shrink-0 p-2 sm:p-2.5"
-                    >
-                      <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-2 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-2 rounded">
-                        <div>
-                          {/* Card Image */}
-                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded bg-[#E5E7EB]">
-                            <Image
-                              src={item.image}
-                              alt={item.title}
-                              fill
-                              className="object-cover transition-transform duration-500 group-hover:scale-105"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            />
-                          </div>
+                <ChevronLeft size={20} />
+              </button>
 
-                          {/* Number & Icon */}
-                          <div className="mt-5 flex items-center justify-between">
-                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
-                              {item.number}
-                            </span>
-                            <div className="flex h-10 w-10 items-center justify-center border border-[#FCD580]/70 bg-[#FEFCF7] text-[#B37D0C] transition-colors group-hover:border-[#F8B526] group-hover:bg-[#F8B526] group-hover:text-[#1F2937]">
-                              <Icon size={20} strokeWidth={1.5} />
+              {/* Slider Viewport */}
+              <div className="mx-2 flex-1 overflow-hidden sm:mx-4">
+                <div
+                  className="flex transition-transform duration-700 ease-in-out"
+                  style={{ transform: `translateX(-${activeIndustry * (100 / industryItemsPerView)}%)` }}
+                >
+                  {filteredIndustries.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <div
+                        key={item.number}
+                        style={{ width: `${100 / industryItemsPerView}%` }}
+                        className="shrink-0 p-2 sm:p-2.5"
+                      >
+                        <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-2 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-2 rounded">
+                          <div>
+                            {/* Card Image */}
+                            <div className="relative aspect-[16/9] w-full overflow-hidden rounded bg-[#E5E7EB]">
+                              <Image
+                                src={item.image}
+                                alt={item.title}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                              />
                             </div>
+
+                            {/* Number & Icon */}
+                            <div className="mt-5 flex items-center justify-between">
+                              <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                                {item.number}
+                              </span>
+                              <div className="flex h-10 w-10 items-center justify-center border border-[#FCD580]/70 bg-[#FEFCF7] text-[#B37D0C] transition-colors group-hover:border-[#F8B526] group-hover:bg-[#F8B526] group-hover:text-[#1F2937]">
+                                <Icon size={20} strokeWidth={1.5} />
+                              </div>
+                            </div>
+
+                            {/* Title */}
+                            <h3 className="mt-3 text-lg font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                              {item.title}
+                            </h3>
+
+                            {/* Description */}
+                            <p className="mt-2 text-xs leading-relaxed text-[#4B5563]">
+                              {item.description}
+                            </p>
                           </div>
 
-                          {/* Title */}
-                          <h3 className="mt-3 text-lg font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
-                            {item.title}
-                          </h3>
-
-                          {/* Description */}
-                          <p className="mt-2 text-xs leading-relaxed text-[#4B5563]">
-                            {item.description}
-                          </p>
-                        </div>
-
-                        {/* Bottom Link */}
-                        <div className="mt-5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#B37D0C] transition-colors group-hover:text-[#1F2937]">
-                          <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">
-                            LEARN MORE
-                          </a>
-                          <ArrowUpRight size={14} className="relative z-10" />
+                          {/* Bottom Link */}
+                          <div className="mt-5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#B37D0C] transition-colors group-hover:text-[#1F2937]">
+                            <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">
+                              LEARN MORE
+                            </a>
+                            <ArrowUpRight size={14} className="relative z-10" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
+
+              {/* Right Navigation Arrow */}
+              <button
+                onClick={() =>
+                  setActiveIndustry((prev) =>
+                    prev >= filteredIndustries.length - industryItemsPerView ? 0 : prev + 1
+                  )
+                }
+                className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+                aria-label="Next industries"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
 
-            {/* Right Navigation Arrow */}
-            <button
-              onClick={() =>
-                setActiveIndustry((prev) =>
-                  prev >= filteredIndustries.length - industryItemsPerView ? 0 : prev + 1
-                )
-              }
-              className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
-              aria-label="Next industries"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-
-          {/* Dots Pagination */}
-          <div className="mt-8 flex justify-center gap-2">
-            {Array.from({ length: Math.max(1, filteredIndustries.length - industryItemsPerView + 1) }).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveIndustry(idx)}
-                className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none ${
-                  activeIndustry === idx ? 'w-8 bg-[#F8B526]' : 'w-2 bg-[#E5E7EB] hover:bg-[#D1D5DB]'
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
-          </div>
+            {/* Dots Pagination */}
+            <div className="mt-8 flex justify-center gap-2">
+              {Array.from({ length: Math.max(1, filteredIndustries.length - industryItemsPerView + 1) }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveIndustry(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none ${
+                    activeIndustry === idx ? 'w-8 bg-[#F8B526]' : 'w-2 bg-[#E5E7EB] hover:bg-[#D1D5DB]'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </RevealOnScroll>
         </div>
       </section>
 
@@ -1050,188 +1184,196 @@ export default function Page() {
           <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
             {/* Left Column: Heading, Subtitle & Callout */}
             <div className="lg:col-span-5 xl:col-span-5">
-              <p className="eyebrow flex items-center gap-3">
-                <span className="h-px w-8 bg-[#F8B526]" />
-                Research &amp; Development / 05
-              </p>
-              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
-                Focused on<br />
-                <span className="text-[#8C6109]">what&apos;s next.</span>
-              </h2>
-              <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
-                RUGENX functions as an externalized R&amp;D partner—transforming early research, physical prototypes, and emerging technologies into proven, production-grade industrial machinery.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-5">
-                <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 rounded bg-[#F8B526] px-5 py-3 text-xs font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow"
-                >
-                  Start an R&amp;D Project <ArrowRight size={14} />
-                </a>
-                <a
-                  href="#engagement"
-                  className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#B37D0C] transition-colors hover:text-[#8C6109]"
-                >
-                  Engagement Models <ArrowRight size={13} />
-                </a>
-              </div>
+              <RevealOnScroll direction="up">
+                <p className="eyebrow flex items-center gap-3">
+                  <span className="h-px w-8 bg-[#F8B526]" />
+                  Research &amp; Development / 05
+                </p>
+                <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
+                  Focused on<br />
+                  <span className="text-[#8C6109]">what&apos;s next.</span>
+                </h2>
+                <p className="mt-6 text-base leading-relaxed text-[#4B5563]">
+                  RUGENX functions as an externalized R&amp;D partner—transforming early research, physical prototypes, and emerging technologies into proven, production-grade industrial machinery.
+                </p>
+                <div className="mt-8 flex flex-wrap items-center gap-5">
+                  <a
+                    href="#contact"
+                    className="inline-flex items-center gap-2 rounded bg-[#F8B526] px-5 py-3 text-xs font-bold text-[#1F2937] shadow-sm transition-all hover:bg-[#D99A0F] hover:shadow"
+                  >
+                    Start an R&amp;D Project <ArrowRight size={14} />
+                  </a>
+                  <a
+                    href="#engagement"
+                    className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#B37D0C] transition-colors hover:text-[#8C6109]"
+                  >
+                    Engagement Models <ArrowRight size={13} />
+                  </a>
+                </div>
+              </RevealOnScroll>
             </div>
 
             {/* Right Column: Large Engineering Visual (aligned with Services and Industries) */}
             <div className="relative lg:col-span-7 xl:col-span-7">
-              <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
-                <Image
-                  src="/development-areas-engineer.png"
-                  alt="Automation and mechatronics engineer testing custom processing machinery in R&D laboratory"
-                  fill
-                  className="object-contain object-right lg:object-cover"
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  priority
-                />
-                {/* Soft gradient edge overlays for seamless background blending */}
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white via-white/70 to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent" />
-              </div>
+              <RevealOnScroll direction="left" delay={150}>
+                <div className="relative mx-auto h-[260px] w-full overflow-hidden sm:h-[320px] md:h-[360px] lg:h-[400px]">
+                  <Image
+                    src="/development-areas-engineer.png"
+                    alt="Automation and mechatronics engineer testing custom processing machinery in R&D laboratory"
+                    fill
+                    className="object-contain object-right lg:object-cover"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    priority
+                  />
+                  {/* Soft gradient edge overlays for seamless background blending */}
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white via-white/70 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent" />
+                </div>
+              </RevealOnScroll>
             </div>
           </div>
 
           {/* Sub-header Bar (matching Services & Industries section rhythm) */}
-          <div className="mt-14 flex items-center justify-between border-t border-[#E5E7EB] pt-6">
-            <div className="flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-[#F8B526]" />
-              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-                Strategic Development Focus
-              </span>
-              <span className="hidden font-mono text-[11px] text-[#9CA3AF] sm:inline">
-                · 06 Applied Technology Domains
+          <RevealOnScroll direction="up">
+            <div className="mt-14 flex items-center justify-between border-t border-[#E5E7EB] pt-6">
+              <div className="flex items-center gap-3">
+                <span className="h-2 w-2 rounded-full bg-[#F8B526]" />
+                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                  Strategic Development Focus
+                </span>
+                <span className="hidden font-mono text-[11px] text-[#9CA3AF] sm:inline">
+                  · 06 Applied Technology Domains
+                </span>
+              </div>
+              <span className="hidden font-mono text-[11px] uppercase tracking-wider text-[#B37D0C] sm:inline">
+                Prototype Rigs · Pilot Systems
               </span>
             </div>
-            <span className="hidden font-mono text-[11px] uppercase tracking-wider text-[#B37D0C] sm:inline">
-              Prototype Rigs · Pilot Systems
-            </span>
-          </div>
+          </RevealOnScroll>
 
           {/* 6 Strategic Development Areas Grid: 3 columns x 2 rows */}
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {developmentAreas.map((item) => (
-              <div
-                key={item.number}
-                className="group relative flex flex-col justify-between border border-[#E5E7EB] bg-[#FEFCF7] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#FCD580] hover:bg-white hover:shadow-[0_12px_28px_rgba(248,181,38,0.12)]"
-              >
-                {/* Top Accent Hover Line (matching How We Work & Engagement cards) */}
-                <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
-                
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
-                      {item.number}
-                    </span>
-                    <div className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#B37D0C] shadow-sm transition-all duration-300 group-hover:border-[#F8B526] group-hover:bg-[#FEFCF7] group-hover:text-[#8C6109] group-hover:scale-105">
-                      <item.icon className="h-4 w-4" />
+            {developmentAreas.map((item, idx) => (
+              <RevealOnScroll key={item.number} direction="up" delay={(idx % 3) * 100}>
+                <div className="group relative flex h-full flex-col justify-between border border-[#E5E7EB] bg-[#FEFCF7] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#FCD580] hover:bg-white hover:shadow-[0_12px_28px_rgba(248,181,38,0.12)]">
+                  {/* Top Accent Hover Line (matching How We Work & Engagement cards) */}
+                  <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
+                  
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C] transition-colors group-hover:text-[#F8B526]">
+                        {item.number}
+                      </span>
+                      <div className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#B37D0C] shadow-sm transition-all duration-300 group-hover:border-[#F8B526] group-hover:bg-[#FEFCF7] group-hover:text-[#8C6109] group-hover:scale-105">
+                        <item.icon className="h-4 w-4" />
+                      </div>
                     </div>
+
+                    <h3 className="mt-5 text-base font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-2.5 text-[13px] leading-relaxed text-[#4B5563]">
+                      {item.description}
+                    </p>
                   </div>
 
-                  <h3 className="mt-5 text-base font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
-                    {item.title}
-                  </h3>
-
-                  <p className="mt-2.5 text-[13px] leading-relaxed text-[#4B5563]">
-                    {item.description}
-                  </p>
+                  <div className="mt-6 flex items-center justify-between border-t border-[#E5E7EB]/70 pt-4">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF] transition-colors group-hover:text-[#B37D0C]">
+                      {item.tag || 'R&D Focus'}
+                    </span>
+                    <ArrowUpRight size={14} className="text-[#9CA3AF] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#F8B526]" />
+                  </div>
                 </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-[#E5E7EB]/70 pt-4">
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF] transition-colors group-hover:text-[#B37D0C]">
-                    {item.tag || 'R&D Focus'}
-                  </span>
-                  <ArrowUpRight size={14} className="text-[#9CA3AF] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#F8B526]" />
-                </div>
-              </div>
+              </RevealOnScroll>
             ))}
           </div>
 
           {/* Technology & Engineering Capabilities Strip */}
-          <div className="mt-14 border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 md:p-8">
-            <div className="flex flex-col justify-between gap-3 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-2.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#F8B526]" />
-                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-                  Technology &amp; Engineering Tooling
+          <RevealOnScroll direction="up" delay={150}>
+            <div className="mt-14 border border-[#E5E7EB] bg-[#FEFCF7] p-6 transition-all duration-300 md:p-8">
+              <div className="flex flex-col justify-between gap-3 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-2.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#F8B526]" />
+                  <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                    Technology &amp; Engineering Tooling
+                  </span>
+                </div>
+                <span className="font-mono text-[11px] text-[#9CA3AF]">
+                  Multidisciplinary Infrastructure &amp; CAE Suite
                 </span>
               </div>
-              <span className="font-mono text-[11px] text-[#9CA3AF]">
-                Multidisciplinary Infrastructure &amp; CAE Suite
-              </span>
-            </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {techCapabilities.map((cap) => (
-                <div key={cap.category} className="group flex flex-col justify-start">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center border border-[#F8B526]/80 bg-white text-[#B37D0C] shadow-sm transition-colors group-hover:border-[#F8B526] group-hover:text-[#8C6109]">
-                      <cap.icon className="h-3.5 w-3.5" />
+              <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {techCapabilities.map((cap) => (
+                  <div key={cap.category} className="group flex flex-col justify-start">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-8 w-8 items-center justify-center border border-[#F8B526]/80 bg-white text-[#B37D0C] shadow-sm transition-colors group-hover:border-[#F8B526] group-hover:text-[#8C6109]">
+                        <cap.icon className="h-3.5 w-3.5" />
+                      </div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
+                        {cap.category}
+                      </h4>
                     </div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
-                      {cap.category}
-                    </h4>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-[#4B5563]">
+                      {cap.skills.map((skill, idx) => (
+                        <span key={skill} className="inline-flex items-center gap-1.5">
+                          <span className="transition-colors hover:text-[#1F2937]">{skill}</span>
+                          {idx < cap.skills.length - 1 && (
+                            <span className="select-none font-bold text-[#B37D0C]/60">·</span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-[#4B5563]">
-                    {cap.skills.map((skill, idx) => (
-                      <span key={skill} className="inline-flex items-center gap-1.5">
-                        <span className="transition-colors hover:text-[#1F2937]">{skill}</span>
-                        {idx < cap.skills.length - 1 && (
-                          <span className="select-none font-bold text-[#B37D0C]/60">·</span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          </RevealOnScroll>
         </div>
       </section>
 
       {/* Engagement Models Section */}
       <section id="engagement" className="border-t border-[#E5E7EB] bg-[#FEFCF7] py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="mb-16 max-w-2xl">
-            <p className="eyebrow flex items-center gap-3">
-              <span className="h-px w-8 bg-[#F8B526]"></span>
-              Engagement / 06
-            </p>
-            <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
-              Flexible models.<br />
-              <span className="text-[#8C6109]">Tailored to your needs.</span>
-            </h2>
-            <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
-              Whether you need end-to-end turnkey machinery or dedicated external R&amp;D engineering support, we adapt to fit your project milestones.
-            </p>
-          </div>
+          <RevealOnScroll direction="up">
+            <div className="mb-16 max-w-2xl">
+              <p className="eyebrow flex items-center gap-3">
+                <span className="h-px w-8 bg-[#F8B526]"></span>
+                Engagement / 06
+              </p>
+              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
+                Flexible models.<br />
+                <span className="text-[#8C6109]">Tailored to your needs.</span>
+              </h2>
+              <p className="mt-6 text-base leading-relaxed text-[#4B5563] md:text-lg">
+                Whether you need end-to-end turnkey machinery or dedicated external R&amp;D engineering support, we adapt to fit your project milestones.
+              </p>
+            </div>
+          </RevealOnScroll>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {engagementModels.map((model) => (
-              <div
-                key={model.number}
-                className="group relative flex flex-col justify-between overflow-hidden border border-[#E5E7EB] bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:shadow-[0_12px_30px_rgba(248,181,38,0.1)]"
-              >
-                <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
-                      {model.number}
-                    </span>
-                    <Handshake size={20} className="text-[#B37D0C]/60 transition-colors group-hover:text-[#F8B526]" />
+            {engagementModels.map((model, idx) => (
+              <RevealOnScroll key={model.number} direction="up" delay={(idx % 3) * 100}>
+                <div className="group relative flex h-full flex-col justify-between overflow-hidden border border-[#E5E7EB] bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#F8B526] hover:shadow-[0_12px_30px_rgba(248,181,38,0.1)]">
+                  <div className="absolute left-0 top-0 h-1 w-0 bg-[#F8B526] transition-all duration-500 ease-out group-hover:w-full" />
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                        {model.number}
+                      </span>
+                      <Handshake size={20} className="text-[#B37D0C]/60 transition-colors group-hover:text-[#F8B526]" />
+                    </div>
+                    <h3 className="mt-6 text-lg font-semibold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                      {model.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-[#4B5563]">
+                      {model.description}
+                    </p>
                   </div>
-                  <h3 className="mt-6 text-lg font-semibold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
-                    {model.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-[#4B5563]">
-                    {model.description}
-                  </p>
                 </div>
-              </div>
+              </RevealOnScroll>
             ))}
           </div>
         </div>
@@ -1239,68 +1381,74 @@ export default function Page() {
 
       <section id="leadership" className="border-y border-[#E5E7EB] bg-[#FFFFFF]">
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
-          <div className="mb-16">
-            <p className="eyebrow flex items-center gap-3">
-              <span className="h-px w-8 bg-[#F8B526]"></span>
-              Leadership / 07
-            </p>
-            <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
-              Led by <span className="text-[#8C6109]">engineers.</span>
-            </h2>
-          </div>
+          <RevealOnScroll direction="up">
+            <div className="mb-16">
+              <p className="eyebrow flex items-center gap-3">
+                <span className="h-px w-8 bg-[#F8B526]"></span>
+                Leadership / 07
+              </p>
+              <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
+                Led by <span className="text-[#8C6109]">engineers.</span>
+              </h2>
+            </div>
+          </RevealOnScroll>
 
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             {/* Founder 1 */}
-            <div className="group">
-              <div className="mb-8 flex items-center gap-6">
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-[#E5E7EB] shadow-md transition-all duration-500 ease-out group-hover:border-[#F8B526]">
-                  <Image
-                    src="/kolitha.jpg"
-                    alt="Kolitha Indrachapa Thuduhena"
-                    fill
-                    className="object-cover"
-                  />
+            <RevealOnScroll direction="up" delay={100}>
+              <div className="group h-full">
+                <div className="mb-8 flex items-center gap-6">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-[#E5E7EB] shadow-md transition-all duration-500 ease-out group-hover:border-[#F8B526]">
+                    <Image
+                      src="/kolitha.jpg"
+                      alt="Kolitha Indrachapa Thuduhena"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">Kolitha Indrachapa Thuduhena</h3>
+                    <p className="mt-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-[#B37D0C]">Founder & Director</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">Kolitha Indrachapa Thuduhena</h3>
-                  <p className="mt-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-[#B37D0C]">Founder & Director</p>
+                <div className="space-y-4 text-[15px] leading-relaxed text-[#4B5563]">
+                  <p>
+                    Kolitha is a dedicated electromechanical engineer, entrepreneur, and practical problem-solver with a strong foundation in engineering design and applied innovation. A graduate of the Faculty of Technology, University of Ruhuna, he founded RugenX with a vision to channel technical expertise into practical, real-world engineering solutions.
+                  </p>
+                  <p>
+                    His technical proficiency spans 3D CAD modeling, system programming, and fault diagnosis, skills applied extensively across industrial projects. With extensive professional experience including work with Diesel &amp; Motor Engineering PLC (DIMO) and research into Digital Twin systems, he drives RugenX's vision forward with a hands-on business mindset.
+                  </p>
                 </div>
               </div>
-              <div className="space-y-4 text-[15px] leading-relaxed text-[#4B5563]">
-                <p>
-                  Kolitha is a dedicated electromechanical engineer, entrepreneur, and practical problem-solver with a strong foundation in engineering design and applied innovation. A graduate of the Faculty of Technology, University of Ruhuna, he founded RugenX with a vision to channel technical expertise into practical, real-world engineering solutions.
-                </p>
-                <p>
-                  His technical proficiency spans 3D CAD modeling, system programming, and fault diagnosis, skills applied extensively across industrial projects. With extensive professional experience including work with Diesel &amp; Motor Engineering PLC (DIMO) and research into Digital Twin systems, he drives RugenX's vision forward with a hands-on business mindset.
-                </p>
-              </div>
-            </div>
+            </RevealOnScroll>
 
             {/* Founder 2 */}
-            <div className="group">
-              <div className="mb-8 flex items-center gap-6">
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-[#E5E7EB] shadow-md transition-all duration-500 ease-out group-hover:border-[#F8B526]">
-                  <Image
-                    src="/harshana.jpg"
-                    alt="Harshana Laknath Subasinghe"
-                    fill
-                    className="object-cover"
-                  />
+            <RevealOnScroll direction="up" delay={200}>
+              <div className="group h-full">
+                <div className="mb-8 flex items-center gap-6">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-[#E5E7EB] shadow-md transition-all duration-500 ease-out group-hover:border-[#F8B526]">
+                    <Image
+                      src="/harshana.jpg"
+                      alt="Harshana Laknath Subasinghe"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">Harshana Laknath Subasinghe</h3>
+                    <p className="mt-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-[#B37D0C]">Co-Founder & Director</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">Harshana Laknath Subasinghe</h3>
-                  <p className="mt-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-[#B37D0C]">Co-Founder & Director</p>
+                <div className="space-y-4 text-[15px] leading-relaxed text-[#4B5563]">
+                  <p>
+                    Harshana is a mechanical engineer and practical problem solver with over nine years of experience in engineering design, industrial consulting, and research. He specializes in transforming complex engineering challenges into reliable, cost-effective solutions, applying deep expertise in 3D CAD/CAM modeling, rapid prototyping, and FEA/CFD simulations.
+                  </p>
+                  <p>
+                    Holding a B.Sc. with First Class Honours and a Best Student Award for Engineering Design, his previous leadership roles include serving as Mechanical Coordinator for an EV Development Center. A dedicated mentor and university educator who has supervised over 30 engineering design projects, Harshana expertly oversees operations with a disciplined, results-driven approach.
+                  </p>
                 </div>
               </div>
-              <div className="space-y-4 text-[15px] leading-relaxed text-[#4B5563]">
-                <p>
-                  Harshana is a mechanical engineer and practical problem solver with over nine years of experience in engineering design, industrial consulting, and research. He specializes in transforming complex engineering challenges into reliable, cost-effective solutions, applying deep expertise in 3D CAD/CAM modeling, rapid prototyping, and FEA/CFD simulations.
-                </p>
-                <p>
-                  Holding a B.Sc. with First Class Honours and a Best Student Award for Engineering Design, his previous leadership roles include serving as Mechanical Coordinator for an EV Development Center. A dedicated mentor and university educator who has supervised over 30 engineering design projects, Harshana expertly oversees operations with a disciplined, results-driven approach.
-                </p>
-              </div>
-            </div>
+            </RevealOnScroll>
           </div>
         </div>
       </section>
@@ -1309,160 +1457,172 @@ export default function Page() {
         <div className="mx-auto max-w-7xl px-6 pt-24 lg:px-10 lg:pt-32">
           <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
-              <p className="eyebrow text-[#F8B526]">Start a conversation / 07</p>
-              <h2 className="mt-5 text-4xl font-semibold tracking-[-.07em] sm:text-5xl md:text-6xl">
-                Let's engineer<br />
-                <span className="text-[#F8B526]">the future together.</span>
-              </h2>
-              <p className="mt-6 text-sm leading-7 text-white/70">
-                Have a technical challenge, product idea or process ready to improve? Connect with our engineering team directly or send an inquiry.
-              </p>
-              <div className="mt-8 space-y-4 text-sm text-white/80">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">📍</span>
-                  <span>563/C, Nawagamuwa South, Ranala, Sri Lanka</span>
+              <RevealOnScroll direction="right" delay={100}>
+                <p className="eyebrow text-[#F8B526]">Start a conversation / 07</p>
+                <h2 className="mt-5 text-4xl font-semibold tracking-[-.07em] sm:text-5xl md:text-6xl">
+                  Let's engineer<br />
+                  <span className="text-[#F8B526]">the future together.</span>
+                </h2>
+                <p className="mt-6 text-sm leading-7 text-white/70">
+                  Have a technical challenge, product idea or process ready to improve? Connect with our engineering team directly or send an inquiry.
+                </p>
+                <div className="mt-8 space-y-4 text-sm text-white/80">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">
+                      <MapPin size={16} />
+                    </span>
+                    <span>563/C, Nawagamuwa South, Ranala, Sri Lanka</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">
+                      <Phone size={16} />
+                    </span>
+                    <a href="tel:+94741850060" className="hover:text-[#F8B526] transition-colors">+94 74 18 500 60</a>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">
+                      <Mail size={16} />
+                    </span>
+                    <a href="mailto:rugenxinnovations@gmail.com" className="text-[#F8B526] hover:text-white transition-colors">rugenxinnovations@gmail.com</a>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">📞</span>
-                  <a href="tel:+94741850060" className="hover:text-[#F8B526] transition-colors">+94 74 18 500 60</a>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#F8B526]">✉️</span>
-                  <a href="mailto:rugenxinnovations@gmail.com" className="text-[#F8B526] hover:text-white transition-colors">rugenxinnovations@gmail.com</a>
-                </div>
-              </div>
+              </RevealOnScroll>
             </div>
 
             {/* Direct Engineering Inquiry Form */}
             <div className="rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm lg:col-span-7">
-              <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-[#F8B526]">
-                Submit an Engineering Inquiry
-              </h3>
-              <p className="mt-1 text-xs text-white/60">
-                Share your requirements. Our technical leads will review and respond within 24 hours.
-              </p>
-              <form action="mailto:rugenxinnovations@gmail.com" method="post" encType="text/plain" className="mt-6 space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+              <RevealOnScroll direction="left" delay={200}>
+                <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-[#F8B526]">
+                  Submit an Engineering Inquiry
+                </h3>
+                <p className="mt-1 text-xs text-white/60">
+                  Share your requirements. Our technical leads will review and respond within 24 hours.
+                </p>
+                <form action="mailto:rugenxinnovations@gmail.com" method="post" encType="text/plain" className="mt-6 space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Your Name</label>
+                      <input
+                        type="text"
+                        name="name"
+                        required
+                        placeholder="e.g. John Perera"
+                        className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Email Address</label>
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        placeholder="name@company.com"
+                        className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
+                      />
+                    </div>
+                  </div>
                   <div>
-                    <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Your Name</label>
+                    <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Project Scope / Technical Domain</label>
                     <input
                       type="text"
-                      name="name"
-                      required
-                      placeholder="e.g. John Perera"
+                      name="scope"
+                      placeholder="e.g. Industrial Automation / CFD Simulation / Custom Machinery"
                       className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Email Address</label>
-                    <input
-                      type="email"
-                      name="email"
+                    <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Challenge or Objective Details</label>
+                    <textarea
+                      name="details"
+                      rows={4}
                       required
-                      placeholder="name@company.com"
-                      className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
-                    />
+                      placeholder="Briefly describe your industrial requirement, product concept, or operational bottleneck..."
+                      className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none resize-none"
+                    ></textarea>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Project Scope / Technical Domain</label>
-                  <input
-                    type="text"
-                    name="scope"
-                    placeholder="e.g. Industrial Automation / CFD Simulation / Custom Machinery"
-                    className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-white/70 mb-1.5">Challenge or Objective Details</label>
-                  <textarea
-                    name="details"
-                    rows={4}
-                    required
-                    placeholder="Briefly describe your industrial requirement, product concept, or operational bottleneck..."
-                    className="w-full rounded border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#F8B526] focus:bg-white/15 focus:outline-none resize-none"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  className="mt-2 inline-flex items-center gap-2 rounded bg-[#F8B526] px-6 py-3 text-xs font-bold uppercase tracking-widest text-[#1F2937] transition-all hover:bg-[#D99A0F] hover:shadow-lg"
-                >
-                  Send Inquiry <ArrowUpRight size={16} />
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    className="mt-2 inline-flex items-center gap-2 rounded bg-[#F8B526] px-6 py-3 text-xs font-bold uppercase tracking-widest text-[#1F2937] transition-all hover:bg-[#D99A0F] hover:shadow-lg"
+                  >
+                    Send Inquiry <ArrowUpRight size={16} />
+                  </button>
+                </form>
+              </RevealOnScroll>
             </div>
           </div>
 
           <footer className="mt-32 border-t border-white/15 pb-12 pt-16">
-            <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-              {/* Branding and Contact */}
-              <div className="lg:col-span-1">
-                <a href="#top" className="flex items-center gap-3" aria-label="RUGENX home">
-                  <Image
-                    src="/RugenX - Logo_BLACK.png"
-                    alt="RUGENX Logo"
-                    width={160}
-                    height={84}
-                    className="h-9 w-auto object-contain brightness-0 invert"
-                  />
-                </a>
-                <p className="mt-6 text-[13px] leading-relaxed text-white/60">
-                  Engineering consultancy & industrial technology solutions company based in Sri Lanka.
-                </p>
-                <div className="mt-8 space-y-2 text-[13px] text-white/70">
-                  <p>+94 74 18 500 60</p>
-                  <p>563/C, Nawagamuwa South,<br />Ranala, Sri Lanka.</p>
+            <RevealOnScroll direction="up" delay={100}>
+              <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+                {/* Branding and Contact */}
+                <div className="lg:col-span-1">
+                  <a href="#top" className="flex items-center gap-3" aria-label="RUGENX home">
+                    <Image
+                      src="/RugenX - Logo_BLACK.png"
+                      alt="RUGENX Logo"
+                      width={160}
+                      height={84}
+                      className="h-9 w-auto object-contain brightness-0 invert"
+                    />
+                  </a>
+                  <p className="mt-6 text-[13px] leading-relaxed text-white/60">
+                    Engineering consultancy & industrial technology solutions company based in Sri Lanka.
+                  </p>
+                  <div className="mt-8 space-y-2 text-[13px] text-white/70">
+                    <p>+94 74 18 500 60</p>
+                    <p>563/C, Nawagamuwa South,<br />Ranala, Sri Lanka.</p>
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <div>
+                  <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#F8B526]">Navigation</h3>
+                  <ul className="mt-6 space-y-3 text-[13px] text-white/70">
+                    <li><a href="#top" className="transition-colors hover:text-white">Home</a></li>
+                    <li><a href="#about" className="transition-colors hover:text-white">About Us</a></li>
+                    <li><a href="#capabilities" className="transition-colors hover:text-white">Services</a></li>
+                    <li><a href="#industries" className="transition-colors hover:text-white">Industries</a></li>
+                    <li><a href="#rd" className="transition-colors hover:text-white">Research &amp; Development</a></li>
+                    <li><a href="#engagement" className="transition-colors hover:text-white">Engagement Models</a></li>
+                    <li><a href="#leadership" className="transition-colors hover:text-white">Leadership</a></li>
+                    <li><a href="#contact" className="transition-colors hover:text-white">Contact</a></li>
+                  </ul>
+                </div>
+
+                {/* Capabilities */}
+                <div>
+                  <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#F8B526]">Capabilities</h3>
+                  <ul className="mt-6 space-y-3 text-[13px] text-white/70">
+                    <li>Engineering Consultancy</li>
+                    <li>Product Development</li>
+                    <li>CAE & Simulation</li>
+                    <li>Industrial Automation</li>
+                    <li>Research & Development</li>
+                    <li>Prototyping & Testing</li>
+                  </ul>
+                </div>
+
+                {/* Leadership */}
+                <div>
+                  <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#F8B526]">Leadership</h3>
+                  <ul className="mt-6 space-y-5 text-sm text-white/70">
+                    <li>
+                      <strong className="block font-medium text-white">Kolitha Indrachapa Thuduhena</strong>
+                      <span className="text-xs text-white/50">Founder & Director</span>
+                    </li>
+                    <li>
+                      <strong className="block font-medium text-white">Harshana Laknath Subasinghe</strong>
+                      <span className="text-xs text-white/50">Co-Founder & Director</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
 
-              {/* Navigation */}
-              <div>
-                <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#F8B526]">Navigation</h3>
-                <ul className="mt-6 space-y-3 text-[13px] text-white/70">
-                  <li><a href="#top" className="transition-colors hover:text-white">Home</a></li>
-                  <li><a href="#about" className="transition-colors hover:text-white">About Us</a></li>
-                  <li><a href="#capabilities" className="transition-colors hover:text-white">Services</a></li>
-                  <li><a href="#industries" className="transition-colors hover:text-white">Industries</a></li>
-                  <li><a href="#rd" className="transition-colors hover:text-white">Research &amp; Development</a></li>
-                  <li><a href="#engagement" className="transition-colors hover:text-white">Engagement Models</a></li>
-                  <li><a href="#leadership" className="transition-colors hover:text-white">Leadership</a></li>
-                  <li><a href="#contact" className="transition-colors hover:text-white">Contact</a></li>
-                </ul>
+              <div className="mt-20 flex flex-col justify-between gap-5 border-t border-white/10 pt-8 text-[11px] uppercase tracking-[.15em] text-white/40 sm:flex-row">
+                <span>RUGENX (PVT) LTD · Engineered to perform.</span>
+                <span>© {new Date().getFullYear()} RUGENX</span>
               </div>
-
-              {/* Capabilities */}
-              <div>
-                <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#F8B526]">Capabilities</h3>
-                <ul className="mt-6 space-y-3 text-[13px] text-white/70">
-                  <li>Engineering Consultancy</li>
-                  <li>Product Development</li>
-                  <li>CAE & Simulation</li>
-                  <li>Industrial Automation</li>
-                  <li>Research & Development</li>
-                  <li>Prototyping & Testing</li>
-                </ul>
-              </div>
-
-              {/* Leadership */}
-              <div>
-                <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#F8B526]">Leadership</h3>
-                <ul className="mt-6 space-y-5 text-sm text-white/70">
-                  <li>
-                    <strong className="block font-medium text-white">Kolitha Indrachapa Thuduhena</strong>
-                    <span className="text-xs text-white/50">Founder & Director</span>
-                  </li>
-                  <li>
-                    <strong className="block font-medium text-white">Harshana Laknath Subasinghe</strong>
-                    <span className="text-xs text-white/50">Co-Founder & Director</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-20 flex flex-col justify-between gap-5 border-t border-white/10 pt-8 text-[11px] uppercase tracking-[.15em] text-white/40 sm:flex-row">
-              <span>RUGENX (PVT) LTD · Engineered to perform.</span>
-              <span>© {new Date().getFullYear()} RUGENX</span>
-            </div>
+            </RevealOnScroll>
           </footer>
         </div>
       </section>
