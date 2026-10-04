@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     'RUGENX is an engineering consultancy and industrial technology solutions company based in Sri Lanka, delivering practical, high-performance engineering, CAE simulation, industrial automation, and R&D.',
   icons: {
     icon: [
-      { url: '/favicon.ico' },
+      { url: 'favicon.ico' },
       { url: '/icon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/icon.png', sizes: '512x512', type: 'image/png' },
     ],
