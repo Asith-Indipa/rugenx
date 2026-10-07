@@ -616,14 +616,25 @@ export default function Page() {
               }`}
             >
               <div className="relative w-full [mask-image:radial-gradient(ellipse_92%_88%_at_52%_50%,black_65%,transparent_100%)]">
+                {/* Desktop hero image */}
                 <Image
                   src="/hero.png"
                   alt="RUGENX Engineer working on 3D CAD simulation and industrial automation workstation"
                   width={1376}
                   height={768}
                   priority
-                  className="h-auto w-full object-contain"
+                  className="hidden md:block h-auto w-full object-contain"
                   sizes="(max-width: 1024px) 100vw, 70vw"
+                />
+                {/* Mobile hero image */}
+                <Image
+                  src="/hero-mobile.png"
+                  alt="RUGENX Engineer working on 3D CAD simulation and industrial automation workstation"
+                  width={978}
+                  height={762}
+                  priority
+                  className="block md:hidden h-auto w-full object-contain"
+                  sizes="100vw"
                 />
               </div>
             </div>
@@ -638,11 +649,7 @@ export default function Page() {
             <div className="lg:col-span-7 lg:pr-12 xl:pr-16">
               <div className="sticky top-32">
                 <RevealOnScroll direction="up">
-                  <p className="eyebrow flex items-center gap-3">
-                    <span className="h-px w-8 bg-[#F8B526]" />
-                    About RUGENX / 01
-                  </p>
-
+                
                   <h2 className="mt-6 text-5xl font-semibold leading-[1.1] tracking-[-.06em] md:text-6xl/tight">
                     Practical ideas.<br />
                     <span className="text-[#8C6109]">Engineered well.</span>
@@ -718,10 +725,7 @@ export default function Page() {
             {/* Left Column: Heading & Intro */}
             <div className="lg:col-span-5 xl:col-span-5">
               <RevealOnScroll direction="up">
-                <p className="eyebrow flex items-center gap-3">
-                  <span className="h-px w-8 bg-[#F8B526]" />
-                  Services &amp; Capabilities / 02
-                </p>
+                
                 <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
                   The technical depth<br />
                   <span className="text-[#8C6109]">to move forward.</span>
@@ -863,11 +867,7 @@ export default function Page() {
               <RevealOnScroll direction="up">
                 <div className="flex flex-col justify-between h-full">
                   <div>
-                    <p className="eyebrow flex items-center gap-3">
-                      <span className="h-px w-8 bg-[#F8B526]" />
-                      Engineering Methodology / 03
-                    </p>
-
+                    
                     <h2 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-.06em] text-[#1F2937] md:text-6xl">
                       Design.<br />
                       Simulate.<br />
@@ -973,7 +973,7 @@ export default function Page() {
                               {step.title}
                             </h3>
 
-                            <p className="mt-2 text-base font-medium text-[#1F2937]">
+                            <p className="mt-2 text-base font-medium text-[#1F2937] text-left">
                               {step.description}
                             </p>
 
@@ -1003,10 +1003,7 @@ export default function Page() {
             {/* Left Column: Heading, Subtitle & Filter Tabs */}
             <div className="lg:col-span-6 xl:col-span-5">
               <RevealOnScroll direction="up">
-                <p className="eyebrow flex items-center gap-3">
-                  <span className="h-px w-8 bg-[#F8B526]" />
-                  Industries We Serve / 04
-                </p>
+           
                 <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
                   Useful in the<br />
                   <span className="text-[#8C6109]">real world.</span>
@@ -1185,10 +1182,7 @@ export default function Page() {
             {/* Left Column: Heading, Subtitle & Callout */}
             <div className="lg:col-span-5 xl:col-span-5">
               <RevealOnScroll direction="up">
-                <p className="eyebrow flex items-center gap-3">
-                  <span className="h-px w-8 bg-[#F8B526]" />
-                  Research &amp; Development / 05
-                </p>
+                
                 <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] text-[#1F2937] md:text-5xl lg:text-6xl">
                   Focused on<br />
                   <span className="text-[#8C6109]">what&apos;s next.</span>
@@ -1339,10 +1333,7 @@ export default function Page() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <RevealOnScroll direction="up">
             <div className="mb-16 max-w-2xl">
-              <p className="eyebrow flex items-center gap-3">
-                <span className="h-px w-8 bg-[#F8B526]"></span>
-                Engagement / 06
-              </p>
+             
               <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
                 Flexible models.<br />
                 <span className="text-[#8C6109]">Tailored to your needs.</span>
@@ -1383,10 +1374,7 @@ export default function Page() {
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
           <RevealOnScroll direction="up">
             <div className="mb-16">
-              <p className="eyebrow flex items-center gap-3">
-                <span className="h-px w-8 bg-[#F8B526]"></span>
-                Leadership / 07
-              </p>
+              
               <h2 className="mt-5 text-4xl font-semibold tracking-[-.06em] md:text-6xl">
                 Led by <span className="text-[#8C6109]">engineers.</span>
               </h2>
@@ -1458,8 +1446,7 @@ export default function Page() {
           <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-5">
               <RevealOnScroll direction="right" delay={100}>
-                <p className="eyebrow text-[#F8B526]">Start a conversation / 07</p>
-                <h2 className="mt-5 text-4xl font-semibold tracking-[-.07em] sm:text-5xl md:text-6xl">
+                        <h2 className="mt-5 text-4xl font-semibold tracking-[-.07em] sm:text-5xl md:text-6xl">
                   Let's engineer<br />
                   <span className="text-[#F8B526]">the future together.</span>
                 </h2>
