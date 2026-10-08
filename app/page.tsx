@@ -458,6 +458,69 @@ export default function Page() {
     activeIndustryCategory === 'all' ? true : item.category.includes(activeIndustryCategory as any)
   )
 
+  // Navigation helpers for carousels
+  const nextCapability = () =>
+    setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))
+  const prevCapability = () =>
+    setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))
+
+  const nextIndustry = () =>
+    setActiveIndustry((prev) => (prev >= filteredIndustries.length - industryItemsPerView ? 0 : prev + 1))
+  const prevIndustry = () =>
+    setActiveIndustry((prev) => (prev === 0 ? Math.max(0, filteredIndustries.length - industryItemsPerView) : prev - 1))
+
+  // Touch Swipe Handlers for Services Slider
+  const servicesTouchStartX = useRef<number | null>(null)
+  const servicesTouchStartY = useRef<number | null>(null)
+
+  const handleServicesTouchStart = (e: React.TouchEvent) => {
+    servicesTouchStartX.current = e.touches[0].clientX
+    servicesTouchStartY.current = e.touches[0].clientY
+  }
+
+  const handleServicesTouchEnd = (e: React.TouchEvent) => {
+    if (servicesTouchStartX.current === null || servicesTouchStartY.current === null) return
+    const deltaX = servicesTouchStartX.current - e.changedTouches[0].clientX
+    const deltaY = servicesTouchStartY.current - e.changedTouches[0].clientY
+
+    // Ensure horizontal swipe intent (horizontal distance > vertical distance and > 40px)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+      if (deltaX > 0) {
+        nextCapability() // Swiped left -> next
+      } else {
+        prevCapability() // Swiped right -> prev
+      }
+    }
+    servicesTouchStartX.current = null
+    servicesTouchStartY.current = null
+  }
+
+  // Touch Swipe Handlers for Industries Slider
+  const industryTouchStartX = useRef<number | null>(null)
+  const industryTouchStartY = useRef<number | null>(null)
+
+  const handleIndustryTouchStart = (e: React.TouchEvent) => {
+    industryTouchStartX.current = e.touches[0].clientX
+    industryTouchStartY.current = e.touches[0].clientY
+  }
+
+  const handleIndustryTouchEnd = (e: React.TouchEvent) => {
+    if (industryTouchStartX.current === null || industryTouchStartY.current === null) return
+    const deltaX = industryTouchStartX.current - e.changedTouches[0].clientX
+    const deltaY = industryTouchStartY.current - e.changedTouches[0].clientY
+
+    // Ensure horizontal swipe intent (horizontal distance > vertical distance and > 40px)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+      if (deltaX > 0) {
+        nextIndustry() // Swiped left -> next
+      } else {
+        prevIndustry() // Swiped right -> prev
+      }
+    }
+    industryTouchStartX.current = null
+    industryTouchStartY.current = null
+  }
+
   const navLinks = [
     { name: 'Home', href: '#top', id: 'top' },
     { name: 'About', href: '#about', id: 'about' },
@@ -768,14 +831,14 @@ export default function Page() {
             {/* Desktop Navigation Arrows */}
             <div className="hidden items-center gap-2 md:flex">
               <button
-                onClick={() => setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))}
+                onClick={prevCapability}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
                 aria-label="Previous capabilities"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
-                onClick={() => setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))}
+                onClick={nextCapability}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
                 aria-label="Next capabilities"
               >
@@ -786,7 +849,11 @@ export default function Page() {
 
           {/* Service Cards Carousel */}
           <div className="relative mx-auto mt-6 w-full">
-            <div className="overflow-hidden">
+            <div
+              className="overflow-hidden touch-pan-y"
+              onTouchStart={handleServicesTouchStart}
+              onTouchEnd={handleServicesTouchEnd}
+            >
               <div
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${activeCapability * (100 / itemsPerView)}%)` }}
@@ -824,7 +891,7 @@ export default function Page() {
             {/* Mobile Controls & Dots */}
             <div className="mt-8 flex items-center justify-between md:justify-center">
               <button
-                onClick={() => setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))}
+                onClick={prevCapability}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
                 aria-label="Previous capabilities"
               >
@@ -843,7 +910,7 @@ export default function Page() {
               </div>
 
               <button
-                onClick={() => setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))}
+                onClick={nextCapability}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
                 aria-label="Next capabilities"
               >
@@ -1068,19 +1135,19 @@ export default function Page() {
             <div className="relative mt-14 flex items-center">
               {/* Left Navigation Arrow */}
               <button
-                onClick={() =>
-                  setActiveIndustry((prev) =>
-                    prev === 0 ? Math.max(0, filteredIndustries.length - industryItemsPerView) : prev - 1
-                  )
-                }
+                onClick={prevIndustry}
                 className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
                 aria-label="Previous industries"
               >
                 <ChevronLeft size={20} />
               </button>
 
-              {/* Slider Viewport */}
-              <div className="mx-2 flex-1 overflow-hidden sm:mx-4">
+              {/* Slider Viewport with Touch Swipe */}
+              <div
+                className="mx-2 flex-1 overflow-hidden sm:mx-4 touch-pan-y"
+                onTouchStart={handleIndustryTouchStart}
+                onTouchEnd={handleIndustryTouchEnd}
+              >
                 <div
                   className="flex transition-transform duration-700 ease-in-out"
                   style={{ transform: `translateX(-${activeIndustry * (100 / industryItemsPerView)}%)` }}
@@ -1143,11 +1210,7 @@ export default function Page() {
 
               {/* Right Navigation Arrow */}
               <button
-                onClick={() =>
-                  setActiveIndustry((prev) =>
-                    prev >= filteredIndustries.length - industryItemsPerView ? 0 : prev + 1
-                  )
-                }
+                onClick={nextIndustry}
                 className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
                 aria-label="Next industries"
               >
