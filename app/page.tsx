@@ -342,10 +342,10 @@ export default function Page() {
   const [heroMounted, setHeroMounted] = useState(false)
   const [activeSection, setActiveSection] = useState('top')
   const [activeCapability, setActiveCapability] = useState(0)
-  const [itemsPerView, setItemsPerView] = useState(4)
   const [activeIndustryCategory, setActiveIndustryCategory] = useState('all')
   const [activeIndustry, setActiveIndustry] = useState(0)
-  const [industryItemsPerView, setIndustryItemsPerView] = useState(4)
+  const capabilitiesRef = useRef<HTMLDivElement>(null)
+  const industriesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setHeroMounted(true)
@@ -419,44 +419,126 @@ export default function Page() {
     }
   }
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1200) {
-        setItemsPerView(4)
-        setIndustryItemsPerView(4)
-      } else if (window.innerWidth >= 1024) {
-        setItemsPerView(3)
-        setIndustryItemsPerView(3)
-      } else if (window.innerWidth >= 640) {
-        setItemsPerView(2)
-        setIndustryItemsPerView(2)
-      } else {
-        setItemsPerView(1)
-        setIndustryItemsPerView(1)
+  const scrollCapabilities = (direction: 'prev' | 'next') => {
+    if (capabilitiesRef.current) {
+      const card = capabilitiesRef.current.firstElementChild as HTMLElement
+      const scrollAmount = card ? card.offsetWidth + 20 : 300
+      capabilitiesRef.current.scrollBy({
+        left: direction === 'prev' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      })
+    }
+  }
+
+  const scrollToCapability = (index: number) => {
+    if (capabilitiesRef.current) {
+      const card = capabilitiesRef.current.children[index] as HTMLElement
+      if (card) {
+        capabilitiesRef.current.scrollTo({
+          left: card.offsetLeft - capabilitiesRef.current.offsetLeft,
+          behavior: 'smooth',
+        })
       }
     }
+  }
 
-    // Set initial
-    handleResize()
+  const handleCapabilitiesScroll = () => {
+    if (capabilitiesRef.current) {
+      const container = capabilitiesRef.current
+      const card = container.firstElementChild as HTMLElement
+      if (card) {
+        const itemWidth = card.offsetWidth + 20
+        const index = Math.round(container.scrollLeft / itemWidth)
+        setActiveCapability(Math.min(capabilities.length - 1, Math.max(0, index)))
+      }
+    }
+  }
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const scrollIndustries = (direction: 'prev' | 'next') => {
+    if (industriesRef.current) {
+      const card = industriesRef.current.firstElementChild as HTMLElement
+      const scrollAmount = card ? card.offsetWidth + 20 : 320
+      industriesRef.current.scrollBy({
+        left: direction === 'prev' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      })
+    }
+  }
+
+  const scrollToIndustry = (index: number) => {
+    if (industriesRef.current) {
+      const card = industriesRef.current.children[index] as HTMLElement
+      if (card) {
+        industriesRef.current.scrollTo({
+          left: card.offsetLeft - industriesRef.current.offsetLeft,
+          behavior: 'smooth',
+        })
+      }
+    }
+  }
+
+  const handleIndustriesScroll = () => {
+    if (industriesRef.current) {
+      const container = industriesRef.current
+      const card = container.firstElementChild as HTMLElement
+      if (card) {
+        const itemWidth = card.offsetWidth + 20
+        const index = Math.round(container.scrollLeft / itemWidth)
+        setActiveIndustry(Math.min(filteredIndustries.length - 1, Math.max(0, index)))
+      }
+    }
+  }
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveCapability((prev) => {
-        const maxIndex = capabilities.length - itemsPerView
-        return prev >= maxIndex ? 0 : prev + 1
-      })
-    }, 4500)
-
-    return () => clearInterval(timer)
-  }, [itemsPerView])
+    if (industriesRef.current) {
+      industriesRef.current.scrollTo({ left: 0, behavior: 'smooth' })
+      setActiveIndustry(0)
+    }
+  }, [activeIndustryCategory])
 
   const filteredIndustries = industries.filter((item) =>
     activeIndustryCategory === 'all' ? true : item.category.includes(activeIndustryCategory as any)
   )
+
+  // Auto-slider for Core Practice Areas
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (capabilitiesRef.current) {
+        const container = capabilitiesRef.current
+        const card = container.firstElementChild as HTMLElement
+        const itemWidth = card ? card.offsetWidth + 20 : 300
+        const maxScroll = container.scrollWidth - container.clientWidth
+
+        if (container.scrollLeft >= maxScroll - 15) {
+          container.scrollTo({ left: 0, behavior: 'smooth' })
+        } else {
+          container.scrollBy({ left: itemWidth, behavior: 'smooth' })
+        }
+      }
+    }, 4000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  // Auto-slider for Industries image cards
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (industriesRef.current) {
+        const container = industriesRef.current
+        const card = container.firstElementChild as HTMLElement
+        const itemWidth = card ? card.offsetWidth + 20 : 320
+        const maxScroll = container.scrollWidth - container.clientWidth
+
+        if (container.scrollLeft >= maxScroll - 15) {
+          container.scrollTo({ left: 0, behavior: 'smooth' })
+        } else {
+          container.scrollBy({ left: itemWidth, behavior: 'smooth' })
+        }
+      }
+    }, 4500)
+
+    return () => clearInterval(timer)
+  }, [filteredIndustries.length])
 
   const navLinks = [
     { name: 'Home', href: '#top', id: 'top' },
@@ -772,14 +854,14 @@ export default function Page() {
             {/* Desktop Navigation Arrows */}
             <div className="hidden items-center gap-2 md:flex">
               <button
-                onClick={() => setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))}
+                onClick={() => scrollCapabilities('prev')}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
                 aria-label="Previous capabilities"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
-                onClick={() => setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))}
+                onClick={() => scrollCapabilities('next')}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
                 aria-label="Next capabilities"
               >
@@ -790,45 +872,39 @@ export default function Page() {
 
           {/* Service Cards Carousel */}
           <div className="relative mx-auto mt-6 w-full">
-            <div className="overflow-hidden">
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(-${activeCapability * (100 / itemsPerView)}%)` }}
-              >
-                {capabilities.map(([number, title, description, Icon], index) => {
-                  const isActive = index >= activeCapability && index < activeCapability + itemsPerView;
-                  return (
-                    <div
-                      key={number}
-                      aria-hidden={!isActive}
-                      style={{ width: `${100 / itemsPerView}%` }}
-                      className="shrink-0 p-2 md:p-2.5"
-                    >
-                      <div className="group relative flex h-full min-h-[290px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-[#FFFFFF] p-7 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_8px_20px_rgba(248,181,38,0.08)] focus-within:ring-2 focus-within:ring-[#F8B526]">
-                        <div className="absolute right-0 top-0 h-0 w-0 border-l-[28px] border-t-[28px] border-l-transparent border-t-[#F8B526] opacity-0 transition-opacity group-hover:opacity-100" />
-                        <div>
-                          <div className="flex items-start justify-between">
-                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">{number}</span>
-                            <Icon size={22} strokeWidth={1.5} className="text-[#9CA3AF] transition-colors group-hover:text-[#F8B526]" />
-                          </div>
-                          <h3 className="mt-7 text-xl font-semibold tracking-[-.03em] text-[#1F2937] transition-colors group-hover:text-[#8C6109] md:text-2xl">{title}</h3>
-                          <p className="mt-3 text-xs leading-relaxed text-[#4B5563]">{description}</p>
-                        </div>
-                        <div className="mt-8 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#4B5563] transition-colors group-hover:text-[#8C6109]">
-                          <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">LEARN MORE</a>
-                          <ArrowUpRight size={14} className="relative z-10" />
-                        </div>
+            <div
+              ref={capabilitiesRef}
+              onScroll={handleCapabilitiesScroll}
+              className="flex gap-5 overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth py-4"
+            >
+              {capabilities.map(([number, title, description, Icon]) => (
+                <div
+                  key={number}
+                  className="w-[280px] sm:w-[340px] shrink-0 snap-center p-1"
+                >
+                  <div className="group relative flex h-full min-h-[290px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-[#FFFFFF] p-7 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_8px_20px_rgba(248,181,38,0.08)] focus-within:ring-2 focus-within:ring-[#F8B526]">
+                    <div className="absolute right-0 top-0 h-0 w-0 border-l-[28px] border-t-[28px] border-l-transparent border-t-[#F8B526] opacity-0 transition-opacity group-hover:opacity-100" />
+                    <div>
+                      <div className="flex items-start justify-between">
+                        <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">{number}</span>
+                        <Icon size={22} strokeWidth={1.5} className="text-[#9CA3AF] transition-colors group-hover:text-[#F8B526]" />
                       </div>
+                      <h3 className="mt-7 text-xl font-semibold tracking-[-.03em] text-[#1F2937] transition-colors group-hover:text-[#8C6109] md:text-2xl">{title}</h3>
+                      <p className="mt-3 text-xs leading-relaxed text-[#4B5563]">{description}</p>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="mt-8 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#4B5563] transition-colors group-hover:text-[#8C6109]">
+                      <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">LEARN MORE</a>
+                      <ArrowUpRight size={14} className="relative z-10" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Mobile Controls & Dots */}
             <div className="mt-8 flex items-center justify-between md:justify-center">
               <button
-                onClick={() => setActiveCapability((prev) => (prev === 0 ? Math.max(0, capabilities.length - itemsPerView) : prev - 1))}
+                onClick={() => scrollCapabilities('prev')}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
                 aria-label="Previous capabilities"
               >
@@ -836,10 +912,10 @@ export default function Page() {
               </button>
 
               <div className="flex gap-2">
-                {Array.from({ length: Math.max(1, capabilities.length - itemsPerView + 1) }).map((_, idx) => (
+                {capabilities.map(([number], idx) => (
                   <button
-                    key={idx}
-                    onClick={() => setActiveCapability(idx)}
+                    key={number}
+                    onClick={() => scrollToCapability(idx)}
                     className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none ${activeCapability === idx ? 'w-8 bg-[#F8B526]' : 'w-2 bg-[#E5E7EB] hover:bg-[#D1D5DB]'}`}
                     aria-label={`Go to slide ${idx + 1}`}
                   />
@@ -847,7 +923,7 @@ export default function Page() {
               </div>
 
               <button
-                onClick={() => setActiveCapability((prev) => (prev >= capabilities.length - itemsPerView ? 0 : prev + 1))}
+                onClick={() => scrollCapabilities('next')}
                 className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
                 aria-label="Next capabilities"
               >
@@ -1060,110 +1136,130 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Carousel Slider with Left and Right Arrows */}
-          <RevealOnScroll direction="up" delay={200}>
-            <div className="relative mt-14 flex items-center">
-              {/* Left Navigation Arrow */}
-              <button
-                onClick={() =>
-                  setActiveIndustry((prev) =>
-                    prev === 0 ? Math.max(0, filteredIndustries.length - industryItemsPerView) : prev - 1
-                  )
-                }
-                className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
-                aria-label="Previous industries"
-              >
-                <ChevronLeft size={20} />
-              </button>
-
-              {/* Slider Viewport */}
-              <div className="mx-2 flex-1 overflow-hidden sm:mx-4">
-                <div
-                  className="flex transition-transform duration-700 ease-in-out"
-                  style={{ transform: `translateX(-${activeIndustry * (100 / industryItemsPerView)}%)` }}
-                >
-                  {filteredIndustries.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <div
-                        key={item.number}
-                        style={{ width: `${100 / industryItemsPerView}%` }}
-                        className="shrink-0 p-2 sm:p-2.5"
-                      >
-                        <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-2 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-2 rounded">
-                          <div>
-                            {/* Card Image */}
-                            <div className="relative aspect-[16/9] w-full overflow-hidden rounded bg-[#E5E7EB]">
-                              <Image
-                                src={item.image}
-                                alt={item.title}
-                                fill
-                                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                              />
-                            </div>
-
-                            {/* Number & Icon */}
-                            <div className="mt-5 flex items-center justify-between">
-                              <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
-                                {item.number}
-                              </span>
-                              <div className="flex h-10 w-10 items-center justify-center border border-[#FCD580]/70 bg-[#FEFCF7] text-[#B37D0C] transition-colors group-hover:border-[#F8B526] group-hover:bg-[#F8B526] group-hover:text-[#1F2937]">
-                                <Icon size={20} strokeWidth={1.5} />
-                              </div>
-                            </div>
-
-                            {/* Title */}
-                            <h3 className="mt-3 text-lg font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
-                              {item.title}
-                            </h3>
-
-                            {/* Description */}
-                            <p className="mt-2 text-xs leading-relaxed text-[#4B5563]">
-                              {item.description}
-                            </p>
-                          </div>
-
-                          {/* Bottom Link */}
-                          <div className="mt-5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#B37D0C] transition-colors group-hover:text-[#1F2937]">
-                            <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">
-                              LEARN MORE
-                            </a>
-                            <ArrowUpRight size={14} className="relative z-10" />
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Right Navigation Arrow */}
-              <button
-                onClick={() =>
-                  setActiveIndustry((prev) =>
-                    prev >= filteredIndustries.length - industryItemsPerView ? 0 : prev + 1
-                  )
-                }
-                className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
-                aria-label="Next industries"
-              >
-                <ChevronRight size={20} />
-              </button>
+          {/* Sub-header / Carousel Controls Bar */}
+          <div className="mt-12 flex items-center justify-between border-t border-[#E5E7EB]/80 pt-6">
+            <div className="flex items-center gap-3">
+              <span className="h-2 w-2 rounded-full bg-[#F8B526]" />
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                Core Industrial Sectors
+              </span>
+              <span className="hidden font-mono text-[11px] text-[#9CA3AF] sm:inline">
+                · {filteredIndustries.length} Key Sectors
+              </span>
             </div>
 
-            {/* Dots Pagination */}
-            <div className="mt-8 flex justify-center gap-2">
-              {Array.from({ length: Math.max(1, filteredIndustries.length - industryItemsPerView + 1) }).map((_, idx) => (
+            {/* Desktop Navigation Arrows */}
+            <div className="hidden items-center gap-2 md:flex">
+              <button
+                onClick={() => scrollIndustries('prev')}
+                className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+                aria-label="Previous industries"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scrollIndustries('next')}
+                className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526]"
+                aria-label="Next industries"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Carousel Slider */}
+          <RevealOnScroll direction="up" delay={200}>
+            <div className="relative mx-auto mt-6 w-full">
+              <div
+                ref={industriesRef}
+                onScroll={handleIndustriesScroll}
+                className="flex gap-5 overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth py-4"
+              >
+                {filteredIndustries.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <div
+                      key={item.number}
+                      className="w-[280px] sm:w-[340px] shrink-0 snap-center p-1"
+                    >
+                      <div className="group relative flex h-full min-h-[390px] cursor-pointer flex-col justify-between border border-[#E5E7EB] bg-white p-2 transition-all duration-300 hover:border-[#FCD580] hover:bg-[#FEFCF7] hover:shadow-[0_12px_25px_rgba(248,181,38,0.1)] focus-within:ring-2 focus-within:ring-[#F8B526] sm:p-2 rounded">
+                        <div>
+                          {/* Card Image */}
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded bg-[#E5E7EB]">
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            />
+                          </div>
+
+                          {/* Number & Icon */}
+                          <div className="mt-5 flex items-center justify-between">
+                            <span className="font-mono text-xs font-bold tracking-widest text-[#B37D0C]">
+                              {item.number}
+                            </span>
+                            <div className="flex h-10 w-10 items-center justify-center border border-[#FCD580]/70 bg-[#FEFCF7] text-[#B37D0C] transition-colors group-hover:border-[#F8B526] group-hover:bg-[#F8B526] group-hover:text-[#1F2937]">
+                              <Icon size={20} strokeWidth={1.5} />
+                            </div>
+                          </div>
+
+                          {/* Title */}
+                          <h3 className="mt-3 text-lg font-bold tracking-tight text-[#1F2937] transition-colors group-hover:text-[#8C6109]">
+                            {item.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="mt-2 text-xs leading-relaxed text-[#4B5563]">
+                            {item.description}
+                          </p>
+                        </div>
+
+                        {/* Bottom Link */}
+                        <div className="mt-5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#B37D0C] transition-colors group-hover:text-[#1F2937]">
+                          <a href="#contact" className="before:absolute before:inset-0 focus:outline-none">
+                            LEARN MORE
+                          </a>
+                          <ArrowUpRight size={14} className="relative z-10" />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Mobile Controls & Dots */}
+              <div className="mt-8 flex items-center justify-between md:justify-center">
                 <button
-                  key={idx}
-                  onClick={() => setActiveIndustry(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none ${
-                    activeIndustry === idx ? 'w-8 bg-[#F8B526]' : 'w-2 bg-[#E5E7EB] hover:bg-[#D1D5DB]'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+                  onClick={() => scrollIndustries('prev')}
+                  className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
+                  aria-label="Previous industries"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <div className="flex gap-2">
+                  {filteredIndustries.map((item, idx) => (
+                    <button
+                      key={item.number}
+                      onClick={() => scrollToIndustry(idx)}
+                      className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none ${
+                        activeIndustry === idx ? 'w-8 bg-[#F8B526]' : 'w-2 bg-[#E5E7EB] hover:bg-[#D1D5DB]'
+                      }`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => scrollIndustries('next')}
+                  className="flex h-10 w-10 items-center justify-center border border-[#E5E7EB] bg-white text-[#4B5563] transition-colors hover:border-[#FCD580] hover:text-[#B37D0C] focus:outline-none focus:ring-2 focus:ring-[#F8B526] md:hidden"
+                  aria-label="Next industries"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
             </div>
           </RevealOnScroll>
         </div>
